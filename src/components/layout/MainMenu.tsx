@@ -26,7 +26,7 @@ export default function MainMenu() {
     if (path.startsWith("/products/")) return "products";
     if (path.startsWith("/services/")) return "services";
     if (path.startsWith("/suppliers/")) return "suppliers";
-    if (path.startsWith("/blog/")) return "pavblog";
+    if (path.startsWith("/expertblog/")) return "expertblog";
     if (path.startsWith("/videos/")) return "videos";
     
     // Default to products for root path
@@ -41,7 +41,7 @@ export default function MainMenu() {
     { name: "PRODUCTS", icon: <Package className="w-4 h-4 sm:w-5 sm:h-5" />, id: "products", href: "/products" },
     { name: "SERVICES", icon: <Wrench className="w-4 h-4 sm:w-5 sm:h-5" />, id: "services", href: "/services" },
     { name: "SUPPLIERS", icon: <Truck className="w-4 h-4 sm:w-5 sm:h-5" />, id: "suppliers", href: "/suppliers" },
-    { name: "EXPERTBLOG", icon: <FileText className="w-4 h-4 sm:w-5 sm:h-5" />, id: "pavblog", href: "/blog" },
+    { name: "EXPERTBLOG", icon: <FileText className="w-4 h-4 sm:w-5 sm:h-5" />, id: "expertblog", href: "/expertblog" },
     { name: "VIDEOS", icon: <Video className="w-4 h-4 sm:w-5 sm:h-5" />, id: "videos", href: "/videos" },
   ];
 

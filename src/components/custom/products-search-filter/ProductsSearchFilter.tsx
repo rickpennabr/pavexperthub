@@ -30,10 +30,14 @@ import GridOptions from "./GridOptions";
 import { Plus, Minus } from "lucide-react";
 
 export default function ProductsSearchFilter() {
-  // State for managing search bar expansion
+  const [isExpanded, setIsExpanded] = useState(false);
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
+  const [isClient, setIsClient] = useState(false);
   const searchContainerRef = useRef<HTMLDivElement>(null);
-  const [isExpanded, setIsExpanded] = useState(true);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   // Handle click outside and escape key events
   useEffect(() => {
@@ -57,6 +61,22 @@ export default function ProductsSearchFilter() {
       document.removeEventListener('keydown', handleEscape);
     };
   }, []);
+
+  if (!isClient) {
+    return (
+      <section className="w-full">
+        <div className="hidden md:flex h-[60px] p-1 items-center gap-4 bg-white border-b border-black">
+          <div className="flex-1">
+            <div className="h-10 bg-gray-200 animate-pulse rounded-md"></div>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="h-10 w-32 bg-gray-200 animate-pulse rounded-md"></div>
+            <div className="h-10 w-32 bg-gray-200 animate-pulse rounded-md"></div>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="w-full">
