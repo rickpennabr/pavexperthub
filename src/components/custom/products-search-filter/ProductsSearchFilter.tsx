@@ -30,7 +30,7 @@ import GridOptions from "./GridOptions";
 import { Plus, Minus } from "lucide-react";
 
 export default function ProductsSearchFilter() {
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(true);
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
   const [isClient, setIsClient] = useState(false);
   const searchContainerRef = useRef<HTMLDivElement>(null);

@@ -8,11 +8,11 @@ export default function ProductsLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <>
       <ProductsSearchFilter />
       <PageContainer>
         {children}
       </PageContainer>
-    </div>
+    </>
   );
 } 

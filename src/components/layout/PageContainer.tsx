@@ -14,8 +14,8 @@ interface PageContainerProps {
 
 export default function PageContainer({ children }: PageContainerProps) {
   return (
-    <main className="flex-1 w-full bg-black overflow-auto">
+    <main className="h-full flex-1 w-full bg-black overflow-auto">
       {children}
     </main>
   );
-} 
+}
