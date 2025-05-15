@@ -1,0 +1,44 @@
+import type { Metadata } from "next";
+import { Geist, Geist_Mono } from "next/font/google";
+import "./globals.css";
+import Header from "@/components/layout/Header";
+import MainMenu from "@/components/layout/MainMenu";
+import AppContainer from "@/components/layout/AppContainer";
+
+const geistSans = Geist({
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
+});
+
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
+
+export const metadata: Metadata = {
+  title: "PavExpertHub",
+  description: "Online Hardscape Source",
+  icons: {
+    icon: '/images/logo/PavExpertLogoSimble_round.png',
+  },
+};
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <html lang="en">
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      >
+        <AppContainer>
+          <Header />
+          <MainMenu />
+          {children}
+        </AppContainer>
+      </body>
+    </html>
+  );
+}
