@@ -46,48 +46,62 @@ export default function MainMenu() {
   ];
 
   return (
-    <nav className="w-full h-[60px] p-1 bg-black text-white overflow-x-auto sm:overflow-x-visible [&::-webkit-scrollbar]:h-1 [&::-webkit-scrollbar-track]:bg-black [&::-webkit-scrollbar-thumb]:bg-red-500 [&::-webkit-scrollbar-thumb]:rounded-full">
-      <ul className="flex justify-start sm:justify-around items-center h-full px-1 sm:px-4 min-w-[500px] sm:min-w-0 sm:w-full gap-4">
-        {menuItems.map((item) => {
-          const isActive = activeItem === item.id;
+    <>
+      <nav className="w-full h-[60px] py-2 px-1 bg-black text-white overflow-x-auto sm:overflow-x-visible">
+        <ul className="flex justify-start sm:justify-around items-center h-full px-1 sm:px-4 min-w-[500px] sm:min-w-0 sm:w-full gap-4">
+          {menuItems.map((item) => {
+            const isActive = activeItem === item.id;
 
-          return (
-            <li key={item.id} className="flex-shrink-0 h-full flex items-center">
-              <Link
-                href={item.href}
-                className={`flex items-center h-10 px-2 text-xs sm:text-sm md:text-base group whitespace-nowrap relative
-                  ${isActive ? "sm:text-white" : "text-white"}
-                  border-x border-white rounded-md sm:border-0`}
-              >
-                {/* Mobile active background */}
-                {isActive && <span className="absolute inset-0 bg-white rounded-md sm:hidden"></span>}
-
-                {/* Icon */}
-                <span
-                  className={`mr-1 sm:mr-2 flex items-center relative z-10
-                  ${isActive 
-                    ? "text-red-500 sm:text-white scale-125" 
-                    : "text-white transition-transform duration-300 group-hover:scale-125"}`}
+            return (
+              <li key={item.id} className="flex-shrink-0 h-full flex items-center">
+                <Link
+                  href={item.href}
+                  className={`flex items-center h-10 px-2 text-xs sm:text-sm md:text-base group whitespace-nowrap relative
+                    ${isActive ? "sm:text-white" : "text-white"}
+                    border-x border-white rounded-md sm:border-0`}
                 >
-                  {item.icon}
-                </span>
+                  {/* Mobile active background */}
+                  {isActive && <span className="absolute inset-0 bg-white rounded-md sm:hidden"></span>}
 
-                {/* Text */}
-                <span className="relative z-10">
-                  <span className={`${isActive ? "text-black sm:text-white" : "text-white"}`}>{item.name}</span>
+                  {/* Icon */}
+                  <span
+                    className={`mr-1 sm:mr-2 flex items-center relative z-10
+                    ${isActive 
+                      ? "text-red-500 sm:text-white scale-125" 
+                      : "text-white transition-transform duration-300 group-hover:scale-125"}`}
+                  >
+                    {item.icon}
+                  </span>
 
-                  {/* Desktop underline - only visible on desktop */}
-                  {isActive ? (
-                    <span className="absolute -bottom-1 left-0 h-0.5 w-full bg-white hidden sm:block"></span>
-                  ) : (
-                    <span className="absolute -bottom-1 left-0 h-0.5 w-0 bg-white group-hover:w-full transition-all duration-300 hidden sm:block"></span>
-                  )}
-                </span>
-              </Link>
-            </li>
-          );
-        })}
-      </ul>
-    </nav>
+                  {/* Text */}
+                  <span className="relative z-10">
+                    <span className={`${isActive ? "text-black sm:text-white" : "text-white"}`}>{item.name}</span>
+
+                    {/* Desktop underline - only visible on desktop */}
+                    {isActive ? (
+                      <span className="absolute -bottom-1 left-0 h-0.5 w-full bg-white hidden sm:block"></span>
+                    ) : (
+                      <span className="absolute -bottom-1 left-0 h-0.5 w-0 bg-white group-hover:w-full transition-all duration-300 hidden sm:block"></span>
+                    )}
+                  </span>
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      </nav>
+      <style jsx global>{`
+        nav::-webkit-scrollbar {
+          height: 12px;
+        }
+        nav::-webkit-scrollbar-track {
+          background: #000;
+        }
+        nav::-webkit-scrollbar-thumb {
+          background: #ef4444;
+          border-radius: 6px;
+        }
+      `}</style>
+    </>
   );
 }

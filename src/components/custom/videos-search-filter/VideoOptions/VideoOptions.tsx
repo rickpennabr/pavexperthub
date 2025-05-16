@@ -1,66 +1,44 @@
 /**
- * FilterDropdown Component
+ * VideoOptions Component
  * 
- * A reusable dropdown component used by FilterProductOptions to create consistent filter dropdowns.
- * This component handles the UI and interaction logic for individual filter dropdowns, including:
- * - Dropdown toggle
- * - Option selection
- * - Clear selection
+ * A dropdown component for selecting video categories with a consistent design
+ * that matches the product filters. Features include:
+ * - Dropdown toggle with chevron animation
+ * - Option selection with visual feedback
+ * - Clear selection button
  * - Responsive text sizing
- * 
- * Used by: FilterProductOptions
+ * - Click outside handling
+ * - Mobile and desktop layouts
  */
 
-import React, { useEffect, useRef } from "react";
+"use client"
+
+import React, { useEffect, useRef, useState } from "react";
 import { ChevronDown } from "lucide-react";
 import FilterClearButton from "./FilterClearButton";
-import "./styles.css";
 
-/**
- * Props for the FilterDropdown component
- * @param label - The text shown when no option is selected
- * @param selectedValue - Currently selected option value
- * @param isOpen - Controls the dropdown's open/closed state
- * @param onToggle - Callback for toggling the dropdown
- * @param onSelect - Callback when an option is selected
- * @param onClear - Callback for clearing the selection
- * @param options - Array of available options to display
- */
-interface FilterDropdownProps {
-  label: string;
-  selectedValue: string;
-  isOpen: boolean;
-  onToggle: () => void;
+interface VideoOptionsProps {
   onSelect: (value: string) => void;
+  selectedValue: string;
   onClear: () => void;
-  options: string[];
 }
 
-export default function FilterDropdown({
-  label,
-  selectedValue,
-  isOpen,
-  onToggle,
-  onSelect,
-  onClear,
-  options,
-}: FilterDropdownProps) {
+export default function VideoOptions({ onSelect, selectedValue, onClear }: VideoOptionsProps) {
+  const [isOpen, setIsOpen] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Get short label for mobile
-  const shortLabel = label.replace("Pick a ", "");
+  const options = ["Hardscape Education", "Projects", "ExpertTips"];
+
+  const handleToggle = () => {
+    setIsOpen(!isOpen);
+  };
 
   // Handle click outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dropdownRef.current && 
-        !dropdownRef.current.contains(event.target as Node) &&
-        buttonRef.current &&
-        !buttonRef.current.contains(event.target as Node)
-      ) {
-        onToggle();
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
       }
     };
 
@@ -71,7 +49,7 @@ export default function FilterDropdown({
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [isOpen, onToggle]);
+  }, [isOpen]);
 
   // Update dropdown position
   useEffect(() => {
@@ -80,18 +58,11 @@ export default function FilterDropdown({
       const dropdownElement = dropdownRef.current;
       if (dropdownElement) {
         dropdownElement.style.setProperty('--dropdown-left', `${buttonRect.left}px`);
-        dropdownElement.style.setProperty('--dropdown-top', `${buttonRect.bottom + 1}px`);
+        dropdownElement.style.setProperty('--dropdown-top', `${buttonRect.bottom + 4}px`);
         dropdownElement.style.setProperty('--dropdown-width', `${buttonRect.width}px`);
       }
     }
   }, [isOpen]);
-
-  const handleOptionClick = (option: string, e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    onSelect(option);
-    onToggle();
-  };
 
   return (
     <div className="relative flex items-center w-full">
@@ -100,7 +71,7 @@ export default function FilterDropdown({
         type="button"
         className={`flex items-center justify-center h-10 px-2 sm:px-3 border-2 rounded-md text-[11px] sm:text-xs md:text-sm cursor-pointer transition-all duration-300 min-w-[60px] sm:min-w-[80px] md:min-w-0 w-full touch-manipulation
         ${selectedValue ? 'bg-black text-white font-bold border-black' : 'border-red-500 hover:border-red-600'}`}
-        onClick={onToggle}
+        onClick={handleToggle}
       >
         {selectedValue ? (
           <span className={`font-bold ${selectedValue.length > 10 ? "text-[10px] sm:text-[10px] md:text-[11px]" : "text-[11px] sm:text-xs md:text-sm"}`}>
@@ -109,8 +80,7 @@ export default function FilterDropdown({
         ) : (
           <>
             <span className="text-[11px] sm:text-xs md:text-sm font-bold">
-              <span className="md:hidden">{shortLabel}</span>
-              <span className="hidden md:inline">{label}</span>
+              Select Category
             </span>
             <ChevronDown className={`ml-1 md:ml-2 h-3 w-3 sm:h-3 sm:w-3 md:h-4 md:w-4 flex-shrink-0 transition-transform ${isOpen ? 'rotate-180' : ''} ${selectedValue ? 'text-white' : 'text-gray-500'}`} />
           </>
@@ -127,19 +97,21 @@ export default function FilterDropdown({
           >
             <div className="origin-top-right w-full rounded-md shadow-lg bg-white border-2 border-red-500">
               <div 
-                className={`py-1 ${options.length > 10 ? 'max-h-[300px] overflow-y-auto custom-scrollbar' : ''}`} 
+                className="py-1" 
                 role="menu" 
                 aria-orientation="vertical"
               >
                 {options.map((option) => (
                   <button
                     key={option}
-                    type="button"
                     className={`block w-full text-left px-2 sm:px-3 md:px-4 py-1 sm:py-1.5 md:py-2 text-[11px] sm:text-xs md:text-sm text-gray-700 hover:bg-red-50 hover:border-l-4 hover:border-red-500 hover:font-bold transition-all ${
                       option.length > 10 ? "text-[10px] sm:text-[10px] md:text-[11px]" : ""
                     } cursor-pointer touch-manipulation ${selectedValue === option ? "!bg-black !text-white font-bold" : ""}`}
                     role="menuitem"
-                    onClick={(e) => handleOptionClick(option, e)}
+                    onClick={() => {
+                      onSelect(option);
+                      setIsOpen(false);
+                    }}
                   >
                     {option}
                   </button>
@@ -163,12 +135,14 @@ export default function FilterDropdown({
                 {options.map((option) => (
                   <button
                     key={option}
-                    type="button"
                     className={`block w-full text-left px-2 sm:px-3 md:px-4 py-1 sm:py-1.5 md:py-2 text-[11px] sm:text-xs md:text-sm text-gray-700 hover:bg-red-50 hover:border-l-4 hover:border-red-500 hover:font-bold transition-all ${
                       option.length > 10 ? "text-[10px] sm:text-[10px] md:text-[11px]" : ""
                     } cursor-pointer touch-manipulation ${selectedValue === option ? "!bg-black !text-white font-bold" : ""}`}
                     role="menuitem"
-                    onClick={(e) => handleOptionClick(option, e)}
+                    onClick={() => {
+                      onSelect(option);
+                      setIsOpen(false);
+                    }}
                   >
                     {option}
                   </button>

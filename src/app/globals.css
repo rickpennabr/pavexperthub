@@ -24,3 +24,73 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Custom Scrollbar Styles */
+.overflow-y-auto {
+  scrollbar-width: auto;
+  scrollbar-color: #ef4444 transparent;
+}
+
+.overflow-y-auto::-webkit-scrollbar {
+  width: 12px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb {
+  background-color: #ef4444;
+  border-radius: 6px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb:hover {
+  background-color: #dc2626;
+}
+
+/* Style the scrollbar buttons (arrows) */
+.overflow-y-auto::-webkit-scrollbar-button {
+  background-color: #ef4444;
+  height: 20px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-button:hover {
+  background-color: #dc2626;
+}
+
+/* Placeholder text size */
+.placeholder-text {
+  @apply text-sm text-gray-500;
+}
+
+/* Placeholder text that adjusts size */
+input::placeholder {
+  @apply text-xs text-gray-500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Adjust placeholder size based on viewport */
+@media (max-width: 640px) {
+  input::placeholder {
+    @apply text-[10px];
+  }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+  input::placeholder {
+    @apply text-xs;
+  }
+}
+
+@media (min-width: 1025px) {
+  input::placeholder {
+    @apply text-sm;
+    font-size: clamp(10px, 1.5vw, 14px);
+  }
+}

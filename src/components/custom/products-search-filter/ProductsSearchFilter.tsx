@@ -122,17 +122,10 @@ export default function ProductsSearchFilter() {
 
       {/* Desktop Layout */}
       <div className="hidden md:flex h-[60px] p-1 items-center gap-4 bg-white border-b border-black">
-        <div 
-          ref={searchContainerRef}
-          className={`transition-all duration-300 ease-in-out ${
-            isSearchExpanded ? 'flex-1' : 'flex-1'
-          }`}
-        >
-          <ProductsSearchBar onFocus={() => setIsSearchExpanded(true)} />
+        <div className="flex-1">
+          <ProductsSearchBar onFocus={() => {}} />
         </div>
-        <div className={`transition-all duration-300 ease-in-out ${
-          isSearchExpanded ? 'hidden' : 'flex items-center gap-2'
-        }`}>
+        <div className="flex items-center gap-4">
           <FilterProductOptions />
           <GridOptions />
         </div>
