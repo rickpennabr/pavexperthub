@@ -28,16 +28,14 @@
 import React, { useState, useEffect, useRef } from "react";
 import FilterDropdown from "./FilterDropdown";
 import { brands, types, thicknesses, colorOptions } from "./filters-data";
+import { useFilters } from "@/context/filter-context";
 
 export default function FilterProductOptions() {
+  // Get filter state and setter from context
+  const { filters, setFilters } = useFilters();
+  
   // State for managing which dropdown is currently open
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
-  
-  // Individual filter states
-  const [selectedBrand, setSelectedBrand] = useState<string>("");
-  const [selectedType, setSelectedType] = useState<string>("");
-  const [selectedThickness, setSelectedThickness] = useState<string>("");
-  const [selectedColor, setSelectedColor] = useState<string>("");
   
   // Ref for handling click outside events
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -68,15 +66,15 @@ export default function FilterProductOptions() {
       <div className="flex-1 md:flex-none min-w-0">
         <FilterDropdown
           label="Pick a Brand"
-          selectedValue={selectedBrand}
+          selectedValue={filters.brand}
           isOpen={openDropdown === "brand"}
           onToggle={() => setOpenDropdown(openDropdown === "brand" ? null : "brand")}
           onSelect={(value) => {
-            setSelectedBrand(value);
+            setFilters(prev => ({ ...prev, brand: value }));
             setOpenDropdown(null);
           }}
           onClear={() => {
-            setSelectedBrand("");
+            setFilters(prev => ({ ...prev, brand: "" }));
             setOpenDropdown(null);
           }}
           options={brands}
@@ -87,15 +85,15 @@ export default function FilterProductOptions() {
       <div className="flex-1 md:flex-none min-w-0">
         <FilterDropdown
           label="Pick a Type"
-          selectedValue={selectedType}
+          selectedValue={filters.type}
           isOpen={openDropdown === "type"}
           onToggle={() => setOpenDropdown(openDropdown === "type" ? null : "type")}
           onSelect={(value) => {
-            setSelectedType(value);
+            setFilters(prev => ({ ...prev, type: value }));
             setOpenDropdown(null);
           }}
           onClear={() => {
-            setSelectedType("");
+            setFilters(prev => ({ ...prev, type: "" }));
             setOpenDropdown(null);
           }}
           options={types}
@@ -106,15 +104,15 @@ export default function FilterProductOptions() {
       <div className="flex-1 md:flex-none min-w-0">
         <FilterDropdown
           label="Pick a Thickness"
-          selectedValue={selectedThickness}
+          selectedValue={filters.thickness}
           isOpen={openDropdown === "thickness"}
           onToggle={() => setOpenDropdown(openDropdown === "thickness" ? null : "thickness")}
           onSelect={(value) => {
-            setSelectedThickness(value);
+            setFilters(prev => ({ ...prev, thickness: value }));
             setOpenDropdown(null);
           }}
           onClear={() => {
-            setSelectedThickness("");
+            setFilters(prev => ({ ...prev, thickness: "" }));
             setOpenDropdown(null);
           }}
           options={thicknesses}
@@ -125,15 +123,15 @@ export default function FilterProductOptions() {
       <div className="flex-1 md:flex-none min-w-0">
         <FilterDropdown
           label="Pick a Color"
-          selectedValue={selectedColor}
+          selectedValue={filters.color}
           isOpen={openDropdown === "color"}
           onToggle={() => setOpenDropdown(openDropdown === "color" ? null : "color")}
           onSelect={(value) => {
-            setSelectedColor(value);
+            setFilters(prev => ({ ...prev, color: value }));
             setOpenDropdown(null);
           }}
           onClear={() => {
-            setSelectedColor("");
+            setFilters(prev => ({ ...prev, color: "" }));
             setOpenDropdown(null);
           }}
           options={colorOptions}

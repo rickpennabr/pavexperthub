@@ -8,17 +8,17 @@
 
 "use client"
 
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { List, Grid } from "lucide-react";
-
+import { useFilters } from "@/context/filter-context";
 
 export default function GridOptions() {
-  const [isGrid, setIsGrid] = useState(true);
+  const { viewMode, setViewMode } = useFilters();
 
   // Set initial view based on screen size
   useEffect(() => {
     const handleResize = () => {
-      setIsGrid(window.innerWidth >= 640); // 640px is the sm breakpoint
+      setViewMode(window.innerWidth >= 640 ? 'grid' : 'list'); // 640px is the sm breakpoint
     };
 
     // Set initial value
@@ -29,23 +29,23 @@ export default function GridOptions() {
 
     // Cleanup
     return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  }, [setViewMode]);
 
   return (
     <div className="flex items-center gap-2">
       <button 
-        onClick={() => setIsGrid(false)}
+        onClick={() => setViewMode('list')}
         className={`h-10 w-10 flex items-center justify-center border-2 border-black rounded-md transition-colors cursor-pointer
-          ${!isGrid ? 'bg-black' : 'hover:bg-gray-100'}`}
+          ${viewMode === 'list' ? 'bg-black' : 'hover:bg-gray-100'}`}
       >
-        <List className={`w-5 h-5 ${!isGrid ? 'text-white' : 'text-black'}`} />
+        <List className={`w-5 h-5 ${viewMode === 'list' ? 'text-white' : 'text-black'}`} />
       </button>
       <button 
-        onClick={() => setIsGrid(true)}
+        onClick={() => setViewMode('grid')}
         className={`h-10 w-10 flex items-center justify-center border-2 border-black rounded-md transition-colors cursor-pointer
-          ${isGrid ? 'bg-black' : 'hover:bg-gray-100'}`}
+          ${viewMode === 'grid' ? 'bg-black' : 'hover:bg-gray-100'}`}
       >
-        <Grid className={`w-5 h-5 ${isGrid ? 'text-white' : 'text-black'}`} />
+        <Grid className={`w-5 h-5 ${viewMode === 'grid' ? 'text-white' : 'text-black'}`} />
       </button>
     </div>
   );

@@ -4,7 +4,6 @@ import React, { Suspense, useMemo } from "react";
 import { products } from '@/data/products';
 import ProductGridItem from '@/components/layout/ProductGridItem';
 import { useFilters } from '@/context/filter-context';
-import { FilterProvider } from '@/context/filter-context';
 
 function LoadingProducts() {
   return (
@@ -40,9 +39,13 @@ function ProductsGrid() {
         return false;
       }
 
-      // Color filter
-      if (filters.color && product.color !== filters.color) {
-        return false;
+      // Color filter - check both primary color and available colors
+      if (filters.color) {
+        const hasColor = product.color === filters.color || 
+                        product.colors_available.includes(filters.color);
+        if (!hasColor) {
+          return false;
+        }
       }
 
       return true;
@@ -83,27 +86,25 @@ function ProductsGrid() {
 
 export default function ProductsPage() {
   return (
-    <FilterProvider>
-      <div className="w-full">
-        <div className="overflow-x-auto scrollbar-thumb-red-600 scrollbar-track-gray-200" style={{ scrollbarWidth: 'auto', minHeight: 12 }}>
-          <Suspense fallback={<LoadingProducts />}>
-            <ProductsGrid />
-          </Suspense>
-        </div>
-        <style jsx global>{`
-          .overflow-x-auto::-webkit-scrollbar {
-            height: 12px;
-          }
-          .overflow-x-auto::-webkit-scrollbar-thumb {
-            background: #d32f2f;
-            border-radius: 6px;
-          }
-          .overflow-x-auto::-webkit-scrollbar-track {
-            background: #f3f4f6;
-          }
-        `}</style>
+    <div className="w-full">
+      <div className="overflow-x-auto scrollbar-thumb-red-600 scrollbar-track-gray-200 py-2" style={{ scrollbarWidth: 'auto', minHeight: 12 }}>
+        <Suspense fallback={<LoadingProducts />}>
+          <ProductsGrid />
+        </Suspense>
       </div>
-    </FilterProvider>
+      <style jsx global>{`
+        .overflow-x-auto::-webkit-scrollbar {
+          height: 12px;
+        }
+        .overflow-x-auto::-webkit-scrollbar-thumb {
+          background: #d32f2f;
+          border-radius: 6px;
+        }
+        .overflow-x-auto::-webkit-scrollbar-track {
+          background: #f3f4f6;
+        }
+      `}</style>
+    </div>
   );
 } 
 

@@ -1,15 +1,16 @@
 "use client"
 
-import React, { useState, useRef } from "react";
+import React, { useRef } from "react";
 import { Search } from "lucide-react";
 import SearchBarCleaner from "@/components/common/SearchBarCleaner";
+import { useFilters } from "@/context/filter-context";
 
 interface ProductsSearchBarProps {
   onFocus?: () => void;
 }
 
 export default function ProductsSearchBar({ onFocus }: ProductsSearchBarProps) {
-  const [searchText, setSearchText] = useState("");
+  const { searchText, setSearchText } = useFilters();
   const inputRef = useRef<HTMLInputElement>(null);
 
   const handleClear = () => {
