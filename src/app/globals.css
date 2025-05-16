@@ -58,39 +58,44 @@ body {
   background-color: #dc2626;
 }
 
-/* Placeholder text size */
-.placeholder-text {
-  @apply text-sm text-gray-500;
-}
-
-/* Placeholder text that adjusts size */
+/* Global placeholder styling */
 input::placeholder {
-  @apply text-xs text-gray-500;
+  width: 100%;
+  max-width: 100%;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 100%;
   display: block;
-  width: 100%;
   box-sizing: border-box;
+  font-size: clamp(9px, 2vw, 14px);
+  line-height: 1.2;
+  color: #6b7280;
+  padding: 0;
+  margin: 0;
 }
 
-/* Adjust placeholder size based on viewport */
+/* Adjust placeholder size based on container width */
 @media (max-width: 640px) {
   input::placeholder {
-    @apply text-[10px];
+    font-size: clamp(9px, 3vw, 12px);
   }
 }
 
 @media (min-width: 641px) and (max-width: 1024px) {
   input::placeholder {
-    @apply text-xs;
+    font-size: clamp(10px, 2vw, 13px);
   }
 }
 
 @media (min-width: 1025px) {
   input::placeholder {
-    @apply text-sm;
-    font-size: clamp(10px, 1.5vw, 14px);
+    font-size: clamp(11px, 1.5vw, 14px);
+  }
+}
+
+/* Supplier search placeholder */
+@media (min-width: 768px) {
+  input[placeholder="Find Suppliers and Materials..."]::placeholder {
+    font-size: 9px;
   }
 }

@@ -24,11 +24,7 @@ import React, { useState } from "react";
 import VideosSearchBar from "./VideosSearchBar";
 import VideoOptions from "./VideoOptions/VideoOptions";
 
-interface VideosSearchFilterProps {
-  children?: React.ReactNode;
-}
-
-export default function VideosSearchFilter({ children }: VideosSearchFilterProps) {
+export default function VideosSearchFilter() {
   const [searchText, setSearchText] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
   const [isSearchFocused, setIsSearchFocused] = useState(false);

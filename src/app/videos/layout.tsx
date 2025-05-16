@@ -1,13 +1,13 @@
-import React from 'react';
-import VideosSearchFilter from '@/components/custom/videos-search-filter';
-import PageContainer from '@/components/layout/PageContainer';
+import { ReactNode } from 'react';
 import { FilterProvider } from '@/context/filter-context';
+import VideosSearchFilter from '@/components/custom/videos-search-filter/VideosSearchFilter';
+import PageContainer from '@/components/layout/PageContainer';
 
-export default function VideosLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+interface LayoutProps {
+  children: ReactNode;
+}
+
+export default function Layout({ children }: LayoutProps) {
   return (
     <FilterProvider>
       <VideosSearchFilter />

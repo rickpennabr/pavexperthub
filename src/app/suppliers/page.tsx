@@ -145,7 +145,8 @@ export default function SuppliersPage() {
                 ref={inputRef}
                 type="text"
                 placeholder="Find Suppliers and Materials..."
-                className="block w-full pl-8 pr-2 h-10 border-2 border-red-500 rounded-md leading-5 bg-white text-gray-900 focus:outline-none focus:ring-red-300 focus:border-red-500 text-sm transition-all duration-300"
+                className="w-full h-10 pl-10 pr-10 text-base border-2 border-red-500 rounded-md focus:outline-none focus:border-red-600"
+                style={{ height: '40px', maxHeight: '40px', minHeight: '40px' }}
                 value={searchText}
                 onChange={(e) => setSearchText(e.target.value)}
               />
@@ -154,7 +155,7 @@ export default function SuppliersPage() {
 
             {/* Map Button */}
             <button
-              className={`flex items-center gap-2 px-3 h-10 border-2 border-red-500 rounded-md transition-all duration-300 ${
+              className={`flex items-center gap-0.5 px-3 h-10 border-2 border-red-500 rounded-md transition-all duration-300 ${
                 activeTab === 'map' ? 'bg-white text-black' : 'bg-black text-white hover:bg-white hover:text-black'
               }`}
               onClick={() => {

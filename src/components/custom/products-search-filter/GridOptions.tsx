@@ -10,7 +10,7 @@
 
 import React, { useState, useEffect } from "react";
 import { List, Grid } from "lucide-react";
-import { colors } from "@/app/config/colors";
+
 
 export default function GridOptions() {
   const [isGrid, setIsGrid] = useState(true);

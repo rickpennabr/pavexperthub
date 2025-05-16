@@ -22,35 +22,11 @@ import React, { useState, useEffect, useRef } from "react";
 import BlogSearchBar from "./BlogSearchBar";
 
 export default function BlogSearchFilter() {
-  const [isSearchExpanded, setIsSearchExpanded] = useState(false);
   const [isClient, setIsClient] = useState(false);
   const searchContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setIsClient(true);
-  }, []);
-
-  // Handle click outside and escape key events
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (searchContainerRef.current && !searchContainerRef.current.contains(event.target as Node)) {
-        setIsSearchExpanded(false);
-      }
-    };
-
-    const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        setIsSearchExpanded(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    document.addEventListener('keydown', handleEscape);
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-      document.removeEventListener('keydown', handleEscape);
-    };
   }, []);
 
   if (!isClient) {
@@ -73,7 +49,7 @@ export default function BlogSearchFilter() {
           ref={searchContainerRef}
           className="flex-1"
         >
-          <BlogSearchBar onFocus={() => setIsSearchExpanded(true)} />
+          <BlogSearchBar />
         </div>
       </div>
 
@@ -83,7 +59,7 @@ export default function BlogSearchFilter() {
           ref={searchContainerRef}
           className="flex-1"
         >
-          <BlogSearchBar onFocus={() => setIsSearchExpanded(true)} />
+          <BlogSearchBar />
         </div>
       </div>
     </section>

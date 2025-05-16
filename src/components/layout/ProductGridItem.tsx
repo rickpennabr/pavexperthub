@@ -21,17 +21,18 @@ const brandColors: Record<string, string> = {
   belgard: '#1A3057',
   keystone: '#005596',
   'las vegas paver': '#842B38',
-  lvp: '#842B38'
+  lvp: '#842B38',
+  default: '#000000'
 };
 
 const ProductGridItem: React.FC<ProductGridItemProps> = ({ product, viewMode }) => {
   // Get brand color
   const getBrandColor = () => {
-    const normalized = product.brand.toLowerCase();
+    const normalized = product.product_brand.toLowerCase();
     if (normalized.includes('belgard')) return brandColors.belgard;
     if (normalized.includes('keystone')) return brandColors.keystone;
     if (normalized.includes('las vegas') || normalized.includes('lvp')) return brandColors['las vegas paver'];
-    return '#000000';
+    return brandColors.default;
   };
 
   const brandColor = getBrandColor();
@@ -87,10 +88,10 @@ const ProductGridItem: React.FC<ProductGridItemProps> = ({ product, viewMode }) 
             >
               {product.product_name}
             </h3>
-            <span className="text-[11px] md:text-[13px] font-semibold" style={{ color: brandColor }}>{product.brand}</span>
+            <span className="text-[11px] md:text-[13px] font-semibold" style={{ color: brandColor }}>{product.product_brand}</span>
           </div>
           <div className={`flex-shrink-0 flex items-center justify-center ${viewMode === 'list' ? '-ml-4' : 'ml-2'}`}>
-            <BrandLogo brand={product.brand} size="sm" />
+            <BrandLogo brand={product.product_brand} size="sm" />
           </div>
         </div>
 
@@ -101,7 +102,7 @@ const ProductGridItem: React.FC<ProductGridItemProps> = ({ product, viewMode }) 
               {/* Brand and Color specifications */}
               <tr>
                 <td className="font-bold text-red-600 px-0.5 py-0.5 w-[52px] whitespace-nowrap text-left border border-gray-100" title="Brand">Brand</td>
-                <td className={`text-black px-0.5 py-0.5 w-[60px] truncate ${product.brand.length > 10 ? 'text-left' : 'text-center'} border border-gray-100`} title={product.brand}>{product.brand}</td>
+                <td className={`text-black px-0.5 py-0.5 w-[60px] truncate ${product.product_brand.length > 10 ? 'text-left' : 'text-center'} border border-gray-100`} title={product.product_brand}>{product.product_brand}</td>
                 <td className="font-bold text-red-600 px-0.5 py-0.5 w-[52px] whitespace-nowrap text-left border border-gray-100" title="Color">Color</td>
                 <td className={`text-black px-0.5 py-0.5 w-[60px] truncate ${product.color.length > 10 ? 'text-left' : 'text-center'} border border-gray-100`} title={product.color}>{product.color}</td>
               </tr>

@@ -27,35 +27,11 @@ import React, { useState, useEffect, useRef } from "react";
 import ServicesSearchBar from "./ServicesSearchBar";
 
 export default function ServicesSearchFilter() {
-  const [isSearchExpanded, setIsSearchExpanded] = useState(false);
   const [isClient, setIsClient] = useState(false);
   const searchContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setIsClient(true);
-  }, []);
-
-  // Handle click outside and escape key events
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (searchContainerRef.current && !searchContainerRef.current.contains(event.target as Node)) {
-        setIsSearchExpanded(false);
-      }
-    };
-
-    const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        setIsSearchExpanded(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    document.addEventListener('keydown', handleEscape);
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-      document.removeEventListener('keydown', handleEscape);
-    };
   }, []);
 
   if (!isClient) {
@@ -78,7 +54,7 @@ export default function ServicesSearchFilter() {
           ref={searchContainerRef}
           className="flex-1"
         >
-          <ServicesSearchBar onFocus={() => setIsSearchExpanded(true)} />
+          <ServicesSearchBar />
         </div>
       </div>
 
@@ -88,7 +64,7 @@ export default function ServicesSearchFilter() {
           ref={searchContainerRef}
           className="flex-1"
         >
-          <ServicesSearchBar onFocus={() => setIsSearchExpanded(true)} />
+          <ServicesSearchBar />
         </div>
       </div>
     </section>

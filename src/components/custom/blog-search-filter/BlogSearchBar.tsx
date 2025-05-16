@@ -9,7 +9,7 @@
 
 import React, { useState } from "react";
 import { Search, X } from "lucide-react";
-import { colors } from "@/app/config/colors";
+
 
 interface BlogSearchBarProps {
   onFocus?: () => void;

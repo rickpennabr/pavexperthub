@@ -35,7 +35,8 @@ export default function VideosSearchBar({ searchText, onSearchChange, onFocusCha
           onFocus={() => onFocusChange(true)}
           onBlur={() => onFocusChange(false)}
           placeholder="Find Expert Video Content..."
-          className="w-full h-10 pl-10 pr-10 text-[11px] sm:text-xs md:text-sm border-2 border-red-500 rounded-md focus:outline-none focus:border-red-600"
+          className="w-full h-10 pl-10 pr-10 text-[11px] sm:text-xs md:text-sm border-2 border-red-500 rounded-md focus:outline-none focus:border-red-600 text-base"
+          style={{ height: '40px', maxHeight: '40px', minHeight: '40px' }}
         />
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-red-500" />
         {searchText && (

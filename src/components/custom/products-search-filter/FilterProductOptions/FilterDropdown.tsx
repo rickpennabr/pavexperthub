@@ -90,7 +90,6 @@ export default function FilterDropdown({
     e.preventDefault();
     e.stopPropagation();
     onSelect(option);
-    onToggle();
   };
 
   return (
@@ -118,65 +117,33 @@ export default function FilterDropdown({
       </button>
       {selectedValue && <FilterClearButton onClick={onClear} />}
       {isOpen && (
-        <>
-          {/* Mobile Dropdown */}
-          <div 
-            ref={dropdownRef}
-            className="fixed sm:hidden left-[var(--dropdown-left)] top-[var(--dropdown-top)] z-[9999]"
-            style={{ width: 'var(--dropdown-width)' }}
-          >
-            <div className="origin-top-right w-full rounded-md shadow-lg bg-white border-2 border-red-500">
-              <div 
-                className={`py-1 ${options.length > 10 ? 'max-h-[300px] overflow-y-auto custom-scrollbar' : ''}`} 
-                role="menu" 
-                aria-orientation="vertical"
-              >
-                {options.map((option) => (
-                  <button
-                    key={option}
-                    type="button"
-                    className={`block w-full text-left px-2 sm:px-3 md:px-4 py-1 sm:py-1.5 md:py-2 text-[11px] sm:text-xs md:text-sm text-gray-700 hover:bg-red-50 hover:border-l-4 hover:border-red-500 hover:font-bold transition-all ${
-                      option.length > 10 ? "text-[10px] sm:text-[10px] md:text-[11px]" : ""
-                    } cursor-pointer touch-manipulation ${selectedValue === option ? "!bg-black !text-white font-bold" : ""}`}
-                    role="menuitem"
-                    onClick={(e) => handleOptionClick(option, e)}
-                  >
-                    {option}
-                  </button>
-                ))}
-              </div>
+        <div 
+          ref={dropdownRef}
+          className="fixed left-[var(--dropdown-left)] top-[var(--dropdown-top)] z-[9999]"
+          style={{ width: 'var(--dropdown-width)' }}
+        >
+          <div className="origin-top-right w-full rounded-md shadow-lg bg-white border-2 border-red-500">
+            <div 
+              className={`py-1 ${options.length > 10 ? 'max-h-[300px] overflow-y-auto custom-scrollbar' : ''}`} 
+              role="menu" 
+              aria-orientation="vertical"
+            >
+              {options.map((option) => (
+                <button
+                  key={option}
+                  type="button"
+                  className={`block w-full text-left px-2 sm:px-3 md:px-4 py-1 sm:py-1.5 md:py-2 text-[11px] sm:text-xs md:text-sm text-gray-700 hover:bg-red-50 hover:border-l-4 hover:border-red-500 hover:font-bold transition-all ${
+                    option.length > 10 ? "text-[10px] sm:text-[10px] md:text-[11px]" : ""
+                  } cursor-pointer touch-manipulation ${selectedValue === option ? "!bg-black !text-white font-bold" : ""}`}
+                  role="menuitem"
+                  onClick={(e) => handleOptionClick(option, e)}
+                >
+                  {option}
+                </button>
+              ))}
             </div>
           </div>
-
-          {/* Desktop Dropdown */}
-          <div 
-            ref={dropdownRef}
-            className="hidden sm:block fixed left-[var(--dropdown-left)] top-[var(--dropdown-top)] z-[9999]"
-            style={{ width: 'var(--dropdown-width)' }}
-          >
-            <div className="origin-top-right w-full rounded-md shadow-lg bg-white border-2 border-red-500">
-              <div 
-                className="py-1" 
-                role="menu" 
-                aria-orientation="vertical"
-              >
-                {options.map((option) => (
-                  <button
-                    key={option}
-                    type="button"
-                    className={`block w-full text-left px-2 sm:px-3 md:px-4 py-1 sm:py-1.5 md:py-2 text-[11px] sm:text-xs md:text-sm text-gray-700 hover:bg-red-50 hover:border-l-4 hover:border-red-500 hover:font-bold transition-all ${
-                      option.length > 10 ? "text-[10px] sm:text-[10px] md:text-[11px]" : ""
-                    } cursor-pointer touch-manipulation ${selectedValue === option ? "!bg-black !text-white font-bold" : ""}`}
-                    role="menuitem"
-                    onClick={(e) => handleOptionClick(option, e)}
-                  >
-                    {option}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-        </>
+        </div>
       )}
     </div>
   );
