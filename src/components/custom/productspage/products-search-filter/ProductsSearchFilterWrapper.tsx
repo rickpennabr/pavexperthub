@@ -10,7 +10,7 @@
 
 import { usePathname } from "next/navigation";
 import ProductsSearchFilter from "./ProductsSearchFilter";
-import PageContainer from "../../layout/PageContainer";
+import PageContainer from "../../../layout/PageContainer";
 import { useState, useEffect } from "react";
 
 export default function ProductsSearchFilterWrapper({ children }: { children: React.ReactNode }) {
