@@ -11,6 +11,7 @@ console.log('Environment variables status:', {
   sendGridKeyLength: process.env.SENDGRID_API_KEY?.length,
   emailTo: process.env.EMAIL_TO,
   emailFrom: process.env.EMAIL_FROM,
+  nodeEnv: process.env.NODE_ENV,
 });
 
 // Initialize SendGrid only if API key is available
@@ -18,7 +19,7 @@ if (process.env.SENDGRID_API_KEY) {
   console.log('Initializing SendGrid with API key');
   sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 } else {
-  console.log('SendGrid API key is missing');
+  console.error('SendGrid API key is missing. Please check your environment variables.');
 }
 
 export async function POST(request: Request) {
@@ -151,7 +152,7 @@ Images: ${validatedData.images?.length ? validatedData.images.join('\n') : 'No i
                 <li><strong>Referral Source:</strong> ${validatedData.referral === 'Other' ? validatedData.other_referral : validatedData.referral}</li>
               </ul>
               
-              ${validatedData.images && validatedData.images.length > 0 ? `
+              ${validatedData.images?.length ? `
                 <h3 style="color: #666;">Project Images:</h3>
                 <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px;">
                   ${validatedData.images.map((url: string) => `
@@ -169,15 +170,19 @@ Images: ${validatedData.images?.length ? validatedData.images.join('\n') : 'No i
           customerTo: customerMsg.to,
           adminTo: adminMsg.to,
           from: process.env.EMAIL_FROM,
+          nodeEnv: process.env.NODE_ENV,
         });
 
         // Send both emails
-        await Promise.all([
+        const [customerResponse, adminResponse] = await Promise.all([
           sgMail.send(customerMsg),
           sgMail.send(adminMsg)
         ]);
 
-        console.log('Email notifications sent successfully');
+        console.log('Email notifications sent successfully:', {
+          customerStatus: customerResponse[0]?.statusCode,
+          adminStatus: adminResponse[0]?.statusCode,
+        });
       } catch (error) {
         console.error('Error sending email notifications:', error);
         if (error && typeof error === 'object' && 'response' in error) {
@@ -186,24 +191,19 @@ Images: ${validatedData.images?.length ? validatedData.images.join('\n') : 'No i
         // Don't fail the request if email fails
       }
     } else {
-      console.log('Email notifications skipped - SendGrid configuration:', {
+      console.error('Email notifications skipped - Missing SendGrid configuration:', {
         hasApiKey: !!process.env.SENDGRID_API_KEY,
         hasEmailTo: !!process.env.EMAIL_TO,
         hasEmailFrom: !!process.env.EMAIL_FROM,
+        nodeEnv: process.env.NODE_ENV,
       });
     }
 
     return NextResponse.json({ success: true, data });
   } catch (error) {
-    console.error('API route error:', error);
-    if (error instanceof Error) {
-      return NextResponse.json(
-        { error: error.message },
-        { status: 400 }
-      );
-    }
+    console.error('Error processing contact form:', error);
     return NextResponse.json(
-      { error: 'An unexpected error occurred' },
+      { error: 'Failed to process form submission', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     );
   }

@@ -22,6 +22,17 @@ export const metadata: Metadata = {
     icon: '/images/logo/icon.png',
     apple: '/images/logo/icon.png',
   },
+  viewport: {
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 1,
+    userScalable: false,
+  },
+  other: {
+    'apple-mobile-web-app-capable': 'yes',
+    'apple-mobile-web-app-status-bar-style': 'black',
+    'format-detection': 'telephone=no',
+  },
 };
 
 export default function RootLayout({
@@ -44,6 +55,9 @@ export default function RootLayout({
           type="image/png"
           sizes="32x32"
         />
+        <meta name="format-detection" content="telephone=no" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black" />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased h-full flex flex-col`}

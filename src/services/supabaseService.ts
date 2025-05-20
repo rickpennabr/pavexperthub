@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
 import { v4 as uuidv4 } from 'uuid'
+import { Supplier } from '@/types/supplier'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -62,4 +63,52 @@ export const submitFormData = async (formData: unknown): Promise<void> => {
   if (!response.ok) {
     throw new Error(result.error || 'Failed to submit form')
   }
+}
+
+/**
+ * Fetches suppliers from Supabase
+ * @param searchText - Optional search text to filter suppliers
+ * @returns Promise<Supplier[]> - Array of suppliers
+ */
+export const getSuppliers = async (searchText?: string): Promise<Supplier[]> => {
+  let query = supabase
+    .from('suppliers')
+    .select('*')
+    .order('name')
+
+  if (searchText) {
+    // Search across name, address, and supplier_id
+    query = query.or(
+      `name.ilike.%${searchText}%,` +
+      `address.ilike.%${searchText}%,` +
+      `supplier_id.ilike.%${searchText}%`
+    )
+  }
+
+  const { data, error } = await query
+
+  if (error) {
+    throw new Error(`Failed to fetch suppliers: ${error.message}`)
+  }
+
+  return data as Supplier[]
+}
+
+/**
+ * Creates a new supplier in Supabase
+ * @param supplier - The supplier data to create
+ * @returns Promise<Supplier> - The created supplier
+ */
+export const createSupplier = async (supplier: Omit<Supplier, 'id' | 'created_at' | 'updated_at'>): Promise<Supplier> => {
+  const { data, error } = await supabase
+    .from('suppliers')
+    .insert([supplier])
+    .select()
+    .single()
+
+  if (error) {
+    throw new Error(`Failed to create supplier: ${error.message}`)
+  }
+
+  return data as Supplier
 } 

@@ -1,123 +1,35 @@
 "use client";
 
-import React, { useState, useMemo, useRef } from 'react';
-import { Search, MapPin, List } from 'lucide-react';
-import SupplierList from '@/components/custom/SupplierList';
-import { Supplier } from '@/app/types/supplier';
+import React, { useState, useRef, useEffect } from 'react';
+import { Search, MapPin, List, Phone, Globe } from 'lucide-react';
+import { Supplier } from '@/types/supplier';
 import SearchBarCleaner from '@/components/common/SearchBarCleaner';
-
-const suppliers = [
-  // Vegas Stone Brokers first
-  {
-    id: '0',
-    name: 'Vegas Stone Brokers',
-    address: '8801 S Las Vegas Blvd, Las Vegas, NV 89123',
-    lat: 36.1699,
-    lng: -115.1398,
-    types: ['Travertine', 'Porcelain', 'Pavers'],
-    category: 'Stone Supplier',
-    description: 'Premium stone and paver supplier'
-  },
-  // SiteOne Locations (Real addresses)
-  {
-    id: '1',
-    name: 'SiteOne Landscape Supply',
-    address: '6480 Cameron St, Las Vegas, NV 89118',
-    lat: 36.0712,
-    lng: -115.2248,
-    types: ['Pavers', 'Retaining Walls', 'Landscaping Materials'],
-    category: 'Landscape Supply',
-    description: 'Full-service landscape supply company'
-  },
-  {
-    id: '2',
-    name: 'SiteOne Landscape Supply',
-    address: '4175 W Sunset Rd, Las Vegas, NV 89118',
-    lat: 36.0726,
-    lng: -115.1804,
-    types: ['Pavers', 'Retaining Walls', 'Landscaping Materials', 'Irrigation'],
-    category: 'Landscape Supply',
-    description: 'Full-service landscape supply company'
-  },
-  {
-    id: '3',
-    name: 'SiteOne Landscape Supply',
-    address: '8125 W Sahara Ave #110, Las Vegas, NV 89117',
-    lat: 36.1433,
-    lng: -115.2643,
-    types: ['Pavers', 'Retaining Walls', 'Landscaping Materials', 'Lighting'],
-    category: 'Landscape Supply',
-    description: 'Full-service landscape supply company'
-  },
-  // Star Nursery Locations
-  {
-    id: '4',
-    name: 'Star Nursery - North Las Vegas',
-    address: '3758 E Craig Rd, North Las Vegas, NV 89030',
-    lat: 36.2397,
-    lng: -115.1035,
-    types: ['Plants', 'Trees', 'Garden Supplies'],
-    category: 'Nursery',
-    description: 'Local nursery and garden center'
-  },
-  {
-    id: '5',
-    name: 'Star Nursery - Rainbow',
-    address: '8725 S Rainbow Blvd, Las Vegas, NV 89139',
-    lat: 36.0314,
-    lng: -115.2425,
-    types: ['Plants', 'Trees', 'Garden Supplies'],
-    category: 'Nursery',
-    description: 'Local nursery and garden center'
-  },
-  {
-    id: '6',
-    name: 'Star Nursery - Eastern',
-    address: '9270 S Eastern Ave, Las Vegas, NV 89123',
-    lat: 36.0167,
-    lng: -115.1191,
-    types: ['Plants', 'Trees', 'Garden Supplies'],
-    category: 'Nursery',
-    description: 'Local nursery and garden center'
-  },
-  {
-    id: '7',
-    name: 'Star Nursery - Henderson',
-    address: '10000 S Eastern Ave, Henderson, NV 89052',
-    lat: 35.9984,
-    lng: -115.1191,
-    types: ['Plants', 'Trees', 'Garden Supplies'],
-    category: 'Nursery',
-    description: 'Local nursery and garden center'
-  },
-  {
-    id: '8',
-    name: 'Star Nursery - Blue Diamond',
-    address: '5151 Blue Diamond Rd, Las Vegas, NV 89118',
-    lat: 36.0156,
-    lng: -115.2013,
-    types: ['Plants', 'Trees', 'Garden Supplies'],
-    category: 'Nursery',
-    description: 'Local nursery and garden center'
-  },
-];
+import { getSuppliers } from '@/services/supabaseService';
 
 export default function SuppliersPage() {
   const [searchText, setSearchText] = useState('');
   const [selectedSupplier, setSelectedSupplier] = useState<Supplier | null>(null);
   const [activeTab, setActiveTab] = useState<'list' | 'map'>('list');
+  const [suppliers, setSuppliers] = useState<Supplier[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Filter suppliers based on search text
-  const filteredSuppliers = useMemo(() => {
-    if (!searchText) return suppliers;
-    
-    const searchLower = searchText.toLowerCase();
-    return suppliers.filter(supplier => 
-      supplier.name.toLowerCase().includes(searchLower) ||
-      supplier.address.toLowerCase().includes(searchLower) ||
-      supplier.types.some(type => type.toLowerCase().includes(searchLower))
-    );
+  // Fetch suppliers from Supabase
+  useEffect(() => {
+    const fetchSuppliers = async () => {
+      try {
+        const data = await getSuppliers(searchText);
+        setSuppliers(data);
+        setError(null);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to fetch suppliers');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchSuppliers();
   }, [searchText]);
 
   const handleClear = () => {
@@ -129,7 +41,7 @@ export default function SuppliersPage() {
 
   const toggleView = () => {
     setActiveTab(activeTab === 'list' ? 'map' : 'list');
-    if (activeTab === 'list') {
+    if (activeTab === 'list' && suppliers.length > 0) {
       setSelectedSupplier(suppliers[0]);
     }
   };
@@ -150,7 +62,7 @@ export default function SuppliersPage() {
               <input
                 ref={inputRef}
                 type="text"
-                placeholder="Find Suppliers and Materials..."
+                placeholder="Search suppliers by name, ID, or address..."
                 className="w-full h-10 pl-10 pr-10 text-base border-2 border-red-500 rounded-md focus:outline-none focus:border-red-600"
                 style={{ height: '40px', maxHeight: '40px', minHeight: '40px' }}
                 value={searchText}
@@ -182,13 +94,67 @@ export default function SuppliersPage() {
         
         {/* Suppliers List - Hidden on mobile when Map tab is selected */}
         <div className={`flex-1 overflow-y-auto p-2 lg:p-3 ${activeTab === 'map' ? 'hidden md:block' : 'block'}`}>
-          <SupplierList
-            suppliers={filteredSuppliers}
-            selectedSupplier={selectedSupplier}
-            onSupplierSelect={setSelectedSupplier}
-            hasMore={false}
-            onLoadMore={() => {}}
-          />
+          {isLoading ? (
+            <div className="flex items-center justify-center h-full">
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-500 mx-auto"></div>
+                <p className="mt-2 text-gray-600">Loading suppliers...</p>
+              </div>
+            </div>
+          ) : error ? (
+            <div className="text-center text-red-500 p-4">
+              <p>{error}</p>
+            </div>
+          ) : suppliers.length === 0 ? (
+            <div className="text-center text-gray-500 p-4">
+              <p>No suppliers found</p>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {suppliers.map((supplier) => (
+                <div
+                  key={supplier.id}
+                  onClick={() => setSelectedSupplier(supplier)}
+                  className={`p-4 rounded-lg overflow-hidden cursor-pointer hover:scale-[1.01] transition-all duration-300
+                    ${
+                      selectedSupplier?.id === supplier.id
+                        ? 'bg-white border-2 border-black text-black md:bg-black md:text-white'
+                        : 'bg-white text-black md:bg-black md:text-white hover:bg-gray-50 md:hover:bg-gray-800 hover:border-2 hover:border-black'
+                    }`}
+                >
+                  <div className="flex justify-between items-start">
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-lg">{supplier.name}</h3>
+                      <p className="text-sm text-gray-600 md:text-gray-400">{supplier.address}</p>
+                      <div className="mt-2 space-y-1">
+                        {supplier.phone && (
+                          <div className="flex items-center gap-2 text-sm">
+                            <Phone className="h-4 w-4" />
+                            <a href={`tel:${supplier.phone}`} className="hover:underline">
+                              {supplier.phone}
+                            </a>
+                          </div>
+                        )}
+                        {supplier.website && (
+                          <div className="flex items-center gap-2 text-sm">
+                            <Globe className="h-4 w-4" />
+                            <a 
+                              href={supplier.website.startsWith('http') ? supplier.website : `https://${supplier.website}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="hover:underline"
+                            >
+                              {supplier.website}
+                            </a>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
       

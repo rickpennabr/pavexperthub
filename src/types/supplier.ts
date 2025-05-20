@@ -1,5 +1,6 @@
 export interface Supplier {
   id: string;
+  supplier_id: string;
   name: string;
   address: string;
   lat: number;
@@ -7,5 +8,10 @@ export interface Supplier {
   types: string[];
   category?: string;
   subcategory?: string;
-  description: string;
+  description?: string;
+  phone?: string;
+  website?: string;
+  created_at: string;
+  updated_at: string;
+  user_id?: string;
 } 

@@ -1,8 +1,8 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { UseFormRegister, FieldErrors, FieldValues, FieldError, FieldErrorsImpl, Merge } from 'react-hook-form';
-import { User, Mail, Phone, MapPin, Map, Hash, Link } from 'lucide-react';
+import { User, Mail, Phone, MapPin, Map, Hash, Link, ChevronDown } from 'lucide-react';
 
 interface ContactInfoFormProps {
   register: UseFormRegister<FieldValues>;
@@ -19,6 +19,43 @@ const ContactInfoForm: React.FC<ContactInfoFormProps> = ({
   handlePhoneChange,
   handleCityChange
 }) => {
+  const [referralOpen, setReferralOpen] = useState(false);
+  const [cityOpen, setCityOpen] = useState(false);
+  const [selectedReferral, setSelectedReferral] = useState('');
+  const [selectedCity, setSelectedCity] = useState('');
+  const referralRef = useRef<HTMLDivElement>(null);
+  const cityRef = useRef<HTMLDivElement>(null);
+
+  const referralOptions = [
+    'Facebook',
+    'Google',
+    'Instagram',
+    'Friend',
+    'Previous Customer',
+    'Other'
+  ];
+
+  const cityOptions = [
+    'Las Vegas',
+    'Henderson',
+    'North Las Vegas',
+    'Other'
+  ];
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (referralRef.current && !referralRef.current.contains(event.target as Node)) {
+        setReferralOpen(false);
+      }
+      if (cityRef.current && !cityRef.current.contains(event.target as Node)) {
+        setCityOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   const renderErrorMessage = (
     error: FieldError | Merge<FieldError, FieldErrorsImpl<FieldValues>> | undefined
   ) => {
@@ -38,20 +75,40 @@ const ContactInfoForm: React.FC<ContactInfoFormProps> = ({
             How did you hear about us? *
           </label>
         </div>
-        <div className="relative">
-          <select
-            id="referral"
-            {...register('referralSource')}
-            className="mt-1 block w-full rounded-md border-2 border-black shadow-sm focus:border-red-500 focus:ring-red-500 pl-4 pr-4 py-2.5 cursor-pointer bg-black text-white hover:bg-gray-800 focus:bg-black focus:text-white transition-colors duration-200 peer text-sm"
+        <div className="relative" ref={referralRef}>
+          <button
+            type="button"
+            className={`flex items-center justify-between w-full rounded-md border-2 shadow-sm focus:border-red-500 focus:ring-red-500 pl-4 pr-10 py-3 cursor-pointer transition-colors duration-200 text-[16px]
+              ${selectedReferral ? 'bg-black text-white border-black' : 'border-red-500 hover:border-red-600 bg-white text-black'}`}
+            onClick={() => setReferralOpen(!referralOpen)}
           >
-            <option value="" className="bg-black text-white cursor-pointer text-sm">Pick a Referral</option>
-            <option value="Facebook" className="bg-black text-white cursor-pointer text-sm hover:bg-white hover:text-black">Facebook</option>
-            <option value="Google" className="bg-black text-white cursor-pointer text-sm hover:bg-white hover:text-black">Google</option>
-            <option value="Instagram" className="bg-black text-white cursor-pointer text-sm hover:bg-white hover:text-black">Instagram</option>
-            <option value="Friend" className="bg-black text-white cursor-pointer text-sm hover:bg-white hover:text-black">Friend</option>
-            <option value="Previous Customer" className="bg-black text-white cursor-pointer text-sm hover:bg-white hover:text-black">Previous Customer</option>
-            <option value="Other" className="bg-black text-white cursor-pointer text-sm hover:bg-white hover:text-black">Other</option>
-          </select>
+            <span className="font-bold">
+              {selectedReferral || 'Pick a Referral'}
+            </span>
+            <ChevronDown className={`ml-1 md:ml-2 h-4 w-4 flex-shrink-0 transition-transform ${referralOpen ? 'rotate-180' : ''} ${selectedReferral ? 'text-white' : 'text-gray-500'}`} />
+          </button>
+          {referralOpen && (
+            <div className="absolute z-50 w-full mt-1 bg-white border-2 border-red-500 rounded-md shadow-lg">
+              <div className="py-1">
+                {referralOptions.map((option) => (
+                  <button
+                    key={option}
+                    type="button"
+                    className={`block w-full text-left px-4 py-3 text-[16px] text-gray-700 hover:bg-red-50 hover:border-l-4 hover:border-red-500 hover:font-bold transition-all cursor-pointer
+                      ${selectedReferral === option ? 'bg-black text-white font-bold' : ''}`}
+                    onClick={() => {
+                      setSelectedReferral(option);
+                      setReferralOpen(false);
+                      const event = { target: { value: option } } as React.ChangeEvent<HTMLSelectElement>;
+                      register('referralSource').onChange(event);
+                    }}
+                  >
+                    {option}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
         {renderErrorMessage(errors.referralSource)}
       </div>
@@ -70,7 +127,7 @@ const ContactInfoForm: React.FC<ContactInfoFormProps> = ({
               type="text"
               id="other_referral"
               {...register('otherReferralSource')}
-              className="mt-1 block w-full rounded-md border-2 border-black shadow-sm focus:border-red-500 focus:ring-red-500 pl-4 pr-4 py-2.5 cursor-pointer bg-black text-white hover:bg-gray-800 focus:bg-black focus:text-white transition-colors duration-200 peer text-sm"
+              className="mt-1 block w-full rounded-md border-2 border-black shadow-sm focus:border-red-500 focus:ring-red-500 pl-4 pr-4 py-3 cursor-pointer bg-black text-white hover:bg-gray-800 focus:bg-black focus:text-white transition-colors duration-200 text-[16px]"
             />
           </div>
           {renderErrorMessage(errors.otherReferralSource)}
@@ -81,7 +138,7 @@ const ContactInfoForm: React.FC<ContactInfoFormProps> = ({
       <div className="grid grid-cols-2 gap-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <User className="h-5 w-5 text-red-500 transition-transform duration-200 peer-focus:scale-125" />
+            <User className="h-5 w-5 text-red-500" />
             <label htmlFor="first_name" className="text-base font-medium text-black">
               First Name *
             </label>
@@ -91,7 +148,7 @@ const ContactInfoForm: React.FC<ContactInfoFormProps> = ({
               type="text"
               id="first_name"
               {...register('name')}
-              className="mt-1 block w-full rounded-md border-2 border-black shadow-sm focus:border-red-500 focus:ring-red-500 pl-4 pr-4 py-2.5 cursor-pointer focus:bg-black focus:text-white transition-colors duration-200 peer text-sm"
+              className="mt-1 block w-full rounded-md border-2 border-black shadow-sm focus:border-red-500 focus:ring-red-500 pl-4 pr-4 py-3 cursor-pointer focus:bg-black focus:text-white transition-colors duration-200 text-[16px]"
             />
           </div>
           {renderErrorMessage(errors.name)}
@@ -99,7 +156,7 @@ const ContactInfoForm: React.FC<ContactInfoFormProps> = ({
 
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <User className="h-5 w-5 text-red-500 transition-transform duration-200 peer-focus:scale-125" />
+            <User className="h-5 w-5 text-red-500" />
             <label htmlFor="last_name" className="text-base font-medium text-black">
               Last Name *
             </label>
@@ -109,7 +166,7 @@ const ContactInfoForm: React.FC<ContactInfoFormProps> = ({
               type="text"
               id="last_name"
               {...register('lastName')}
-              className="mt-1 block w-full rounded-md border-2 border-black shadow-sm focus:border-red-500 focus:ring-red-500 pl-4 pr-4 py-2.5 cursor-pointer focus:bg-black focus:text-white transition-colors duration-200 peer text-sm"
+              className="mt-1 block w-full rounded-md border-2 border-black shadow-sm focus:border-red-500 focus:ring-red-500 pl-4 pr-4 py-3 cursor-pointer focus:bg-black focus:text-white transition-colors duration-200 text-[16px]"
             />
           </div>
           {renderErrorMessage(errors.lastName)}
@@ -120,7 +177,7 @@ const ContactInfoForm: React.FC<ContactInfoFormProps> = ({
       <div className="grid grid-cols-2 gap-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <Mail className="h-5 w-5 text-red-500 transition-transform duration-200 peer-focus:scale-125" />
+            <Mail className="h-5 w-5 text-red-500" />
             <label htmlFor="email" className="text-base font-medium text-black">
               Email *
             </label>
@@ -131,7 +188,7 @@ const ContactInfoForm: React.FC<ContactInfoFormProps> = ({
               id="email"
               {...register('email')}
               autoComplete="email"
-              className="mt-1 block w-full rounded-md border-2 border-black shadow-sm focus:border-red-500 focus:ring-red-500 pl-4 pr-4 py-2.5 cursor-pointer focus:bg-black focus:text-white transition-colors duration-200 peer text-sm"
+              className="mt-1 block w-full rounded-md border-2 border-black shadow-sm focus:border-red-500 focus:ring-red-500 pl-4 pr-4 py-3 cursor-pointer focus:bg-black focus:text-white transition-colors duration-200 text-[16px]"
             />
           </div>
           {renderErrorMessage(errors.email)}
@@ -139,7 +196,7 @@ const ContactInfoForm: React.FC<ContactInfoFormProps> = ({
 
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <Phone className="h-5 w-5 text-red-500 transition-transform duration-200 peer-focus:scale-125" />
+            <Phone className="h-5 w-5 text-red-500" />
             <label htmlFor="phone" className="text-base font-medium text-black">
               Phone *
             </label>
@@ -152,7 +209,7 @@ const ContactInfoForm: React.FC<ContactInfoFormProps> = ({
               onChange={handlePhoneChange}
               placeholder="(702) 555-1234"
               maxLength={14}
-              className="mt-1 block w-full rounded-md border-2 border-black shadow-sm focus:border-red-500 focus:ring-red-500 pl-4 pr-4 py-2.5 cursor-pointer focus:bg-black focus:text-white transition-colors duration-200 peer text-sm"
+              className="mt-1 block w-full rounded-md border-2 border-black shadow-sm focus:border-red-500 focus:ring-red-500 pl-4 pr-4 py-3 cursor-pointer focus:bg-black focus:text-white transition-colors duration-200 text-[16px]"
             />
           </div>
           {renderErrorMessage(errors.phone)}
@@ -163,7 +220,7 @@ const ContactInfoForm: React.FC<ContactInfoFormProps> = ({
       <div className="space-y-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <MapPin className="h-5 w-5 text-red-500 transition-transform duration-200 peer-focus:scale-125" />
+            <MapPin className="h-5 w-5 text-red-500" />
             <label htmlFor="address" className="text-base font-medium text-black">
               Street Address *
             </label>
@@ -175,7 +232,7 @@ const ContactInfoForm: React.FC<ContactInfoFormProps> = ({
               {...register('address')}
               placeholder="Enter your street address"
               autoComplete="street-address"
-              className="mt-1 block w-full rounded-md border-2 border-black shadow-sm focus:border-red-500 focus:ring-red-500 pl-4 pr-4 py-2.5 cursor-pointer focus:bg-black focus:text-white transition-colors duration-200 peer text-sm"
+              className="mt-1 block w-full rounded-md border-2 border-black shadow-sm focus:border-red-500 focus:ring-red-500 pl-4 pr-4 py-3 cursor-pointer focus:bg-black focus:text-white transition-colors duration-200 text-[16px]"
             />
           </div>
           {renderErrorMessage(errors.address)}
@@ -184,31 +241,52 @@ const ContactInfoForm: React.FC<ContactInfoFormProps> = ({
         <div className="grid grid-cols-2 gap-4">
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <Map className="h-5 w-5 text-red-500 transition-transform duration-200 peer-focus:scale-125" />
+              <Map className="h-5 w-5 text-red-500" />
               <label htmlFor="city" className="text-base font-medium text-black">
                 City *
               </label>
             </div>
-            <div className="relative">
-              <select
-                id="city"
-                {...register('city')}
-                onChange={handleCityChange}
-                className="mt-1 block w-full rounded-md border-2 border-black shadow-sm focus:border-red-500 focus:ring-red-500 pl-4 pr-4 py-2.5 cursor-pointer bg-black text-white hover:bg-gray-800 focus:bg-black focus:text-white transition-colors duration-200 peer text-sm"
+            <div className="relative" ref={cityRef}>
+              <button
+                type="button"
+                className={`flex items-center justify-between w-full rounded-md border-2 shadow-sm focus:border-red-500 focus:ring-red-500 pl-4 pr-10 py-3 cursor-pointer transition-colors duration-200 text-[16px]
+                  ${selectedCity ? 'bg-black text-white border-black' : 'border-red-500 hover:border-red-600 bg-white text-black'}`}
+                onClick={() => setCityOpen(!cityOpen)}
               >
-                <option value="" className="bg-black text-white cursor-pointer text-sm">Pick a City</option>
-                <option value="Las Vegas" className="bg-black text-white cursor-pointer text-sm hover:bg-white hover:text-black">Las Vegas</option>
-                <option value="Henderson" className="bg-black text-white cursor-pointer text-sm hover:bg-white hover:text-black">Henderson</option>
-                <option value="North Las Vegas" className="bg-black text-white cursor-pointer text-sm hover:bg-white hover:text-black">North Las Vegas</option>
-                <option value="Other" className="bg-black text-white cursor-pointer text-sm hover:bg-white hover:text-black">Other</option>
-              </select>
+                <span className="font-bold">
+                  {selectedCity || 'Pick a City'}
+                </span>
+                <ChevronDown className={`ml-1 md:ml-2 h-4 w-4 flex-shrink-0 transition-transform ${cityOpen ? 'rotate-180' : ''} ${selectedCity ? 'text-white' : 'text-gray-500'}`} />
+              </button>
+              {cityOpen && (
+                <div className="absolute z-50 w-full mt-1 bg-white border-2 border-red-500 rounded-md shadow-lg">
+                  <div className="py-1">
+                    {cityOptions.map((option) => (
+                      <button
+                        key={option}
+                        type="button"
+                        className={`block w-full text-left px-4 py-3 text-[16px] text-gray-700 hover:bg-red-50 hover:border-l-4 hover:border-red-500 hover:font-bold transition-all cursor-pointer
+                          ${selectedCity === option ? 'bg-black text-white font-bold' : ''}`}
+                        onClick={() => {
+                          setSelectedCity(option);
+                          setCityOpen(false);
+                          const event = { target: { value: option } } as React.ChangeEvent<HTMLSelectElement>;
+                          handleCityChange(event);
+                        }}
+                      >
+                        {option}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
             {renderErrorMessage(errors.city)}
           </div>
 
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <Hash className="h-5 w-5 text-red-500 transition-transform duration-200 peer-focus:scale-125" />
+              <Hash className="h-5 w-5 text-red-500" />
               <label htmlFor="zip" className="text-base font-medium text-black">
                 ZIP Code *
               </label>
@@ -219,7 +297,7 @@ const ContactInfoForm: React.FC<ContactInfoFormProps> = ({
                 id="zip"
                 {...register('zip')}
                 placeholder="89XXX"
-                className="mt-1 block w-full rounded-md border-2 border-black shadow-sm focus:border-red-500 focus:ring-red-500 pl-4 pr-4 py-2.5 cursor-pointer focus:bg-black focus:text-white transition-colors duration-200 peer text-sm"
+                className="mt-1 block w-full rounded-md border-2 border-black shadow-sm focus:border-red-500 focus:ring-red-500 pl-4 pr-4 py-3 cursor-pointer focus:bg-black focus:text-white transition-colors duration-200 text-[16px]"
               />
             </div>
             {renderErrorMessage(errors.zip)}
