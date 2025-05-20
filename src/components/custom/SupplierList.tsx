@@ -26,11 +26,12 @@ const SupplierList = ({
           <div
             key={supplier.id}
             onClick={() => onSupplierSelect(supplier)}
-            className={`p-4 rounded-lg cursor-pointer transition-all duration-300 ${
-              selectedSupplier?.id === supplier.id
-                ? 'bg-white border-2 border-black text-black md:bg-black md:text-white'
-                : 'bg-white text-black md:bg-black md:text-white hover:bg-gray-50 md:hover:bg-gray-800 hover:border-2 hover:border-black'
-            }`}
+            className={`p-4 rounded-lg overflow-hidden cursor-pointer hover:scale-[1.01] transition-all duration-300
+              ${
+                selectedSupplier?.id === supplier.id
+                  ? 'bg-white border-2 border-black text-black md:bg-black md:text-white'
+                  : 'bg-white text-black md:bg-black md:text-white hover:bg-gray-50 md:hover:bg-gray-800 hover:border-2 hover:border-black'
+              }`}
           >
             <div className="flex justify-between items-start">
               <div className="flex items-start gap-3">

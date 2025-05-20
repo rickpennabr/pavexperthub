@@ -1,25 +1,29 @@
 /**
  * BlogSearchBar Component
  * 
- * A search input component with a search icon and placeholder text
- * for finding blog posts.
+ * A search input component specifically designed for the blog search functionality.
+ * Features:
+ * - Consistent width design
+ * - Search icon integration
+ * - Clear text button
+ * - Placeholder text for user guidance
+ * - Smooth transitions and hover effects
+ * - Accessible input with proper labeling
  */
 
 "use client"
 
-import React, { useState } from "react";
+import React from "react";
 import { Search, X } from "lucide-react";
 
-
-interface BlogSearchBarProps {
-  onFocus?: () => void;
+export interface BlogSearchBarProps {
+  searchText: string;
+  onSearchChange: (text: string) => void;
 }
 
-export default function BlogSearchBar({ onFocus }: BlogSearchBarProps) {
-  const [searchText, setSearchText] = useState("");
-
+export default function BlogSearchBar({ searchText, onSearchChange }: BlogSearchBarProps) {
   const handleClear = () => {
-    setSearchText("");
+    onSearchChange("");
   };
 
   return (
@@ -28,8 +32,7 @@ export default function BlogSearchBar({ onFocus }: BlogSearchBarProps) {
       <input
         type="text"
         value={searchText}
-        onChange={(e) => setSearchText(e.target.value)}
-        onFocus={onFocus}
+        onChange={(e) => onSearchChange(e.target.value)}
         placeholder="Find Expert Blog Posts..."
         className="w-full outline-none text-sm"
       />

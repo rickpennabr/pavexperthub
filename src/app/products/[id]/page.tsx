@@ -3,8 +3,8 @@
 import React from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import ProductDetailImageSection from '@/components/custom/productspage/product-detail-image/ProductDetailImageSection';
-import ProductDetailDataSection from '@/components/custom/productspage/ProductDetailDataSection';
+import ProductDetailImageSection from '@/components/custom/products-page/product-detail-image/ProductDetailImageSection';
+import ProductDetailDataSection from '@/components/custom/products-page/ProductDetailDataSection';
 import { products } from '@/data/products';
 
 export default function ProductDetailPage() {

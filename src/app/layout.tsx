@@ -19,7 +19,8 @@ export const metadata: Metadata = {
   title: "PavExpertHub",
   description: "Online Hardscape Source",
   icons: {
-    icon: '/images/logo/PavExpertLogoSimble_round.png',
+    icon: '/images/logo/icon.png',
+    apple: '/images/logo/icon.png',
   },
 };
 
@@ -30,6 +31,20 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="h-full">
+      <head>
+        <link
+          rel="icon"
+          href="/images/logo/icon.png"
+          type="image/png"
+          sizes="32x32"
+        />
+        <link
+          rel="apple-touch-icon"
+          href="/images/logo/icon.png"
+          type="image/png"
+          sizes="32x32"
+        />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased h-full flex flex-col`}
       >

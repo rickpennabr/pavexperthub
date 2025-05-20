@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useMemo, useRef } from 'react';
-import { Search, MapPin } from 'lucide-react';
+import { Search, MapPin, List } from 'lucide-react';
 import SupplierList from '@/components/custom/SupplierList';
 import { Supplier } from '@/app/types/supplier';
 import SearchBarCleaner from '@/components/common/SearchBarCleaner';
@@ -123,8 +123,14 @@ export default function SuppliersPage() {
   const handleClear = () => {
     if (searchText) {
       setSearchText("");
-      // Keep focus on input after clearing
       inputRef.current?.focus();
+    }
+  };
+
+  const toggleView = () => {
+    setActiveTab(activeTab === 'list' ? 'map' : 'list');
+    if (activeTab === 'list') {
+      setSelectedSupplier(suppliers[0]);
     }
   };
 
@@ -153,19 +159,24 @@ export default function SuppliersPage() {
               {searchText && <SearchBarCleaner onClear={handleClear} />}
             </div>
 
-            {/* Map Button */}
+            {/* Mobile View Toggle Button - Only visible on mobile */}
             <button
-              className={`flex items-center gap-0.5 px-3 h-10 border-2 border-red-500 rounded-md transition-all duration-300 ${
-                activeTab === 'map' ? 'bg-white text-black' : 'bg-black text-white hover:bg-white hover:text-black'
-              }`}
-              onClick={() => {
-                setActiveTab('map');
-                setSelectedSupplier(suppliers[0]);
-              }}
+              type="button"
+              className="md:hidden flex items-center gap-0.5 px-3 h-10 border-2 border-red-500 rounded-md transition-all duration-300 bg-black text-white hover:bg-white hover:text-black"
+              onClick={toggleView}
             >
-              <MapPin className="h-5 w-5" />
-              <span className="text-sm font-medium">Map</span>
-            </button>
+              {activeTab === 'list' ? (
+                <>
+                  <MapPin className="h-5 w-5" />
+                  <span className="text-sm font-medium">Map</span>
+                </>
+              ) : (
+                <>
+                  <List className="h-5 w-5" />
+                  <span className="text-sm font-medium">List</span>
+                </>
+              )}
+            </button>           
           </div>
         </div>
         

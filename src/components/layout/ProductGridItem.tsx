@@ -7,8 +7,8 @@
 import React from 'react';
 import Link from 'next/link';
 import { Product } from '@/data/products';
-import ProductPlaceholder from '../custom/productspage/product-grid-item/ProductPlaceholder';
-import BrandLogo from '../custom/productspage/product-grid-item/BrandLogo';
+import ProductPlaceholder from '../custom/products-page/product-grid-item/ProductPlaceholder';
+import BrandLogo from '../custom/products-page/product-grid-item/BrandLogo';
 import Image from 'next/image';
 
 // Component props interface

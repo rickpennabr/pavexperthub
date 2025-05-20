@@ -11,7 +11,7 @@
 
 import React, { useEffect, useCallback } from 'react';
 import Image from 'next/image';
-import ProductPlaceholder from '@/components/custom/productspage/product-grid-item/ProductPlaceholder';
+import ProductPlaceholder from '@/components/custom/products-page/product-grid-item/ProductPlaceholder';
 import { isRealImagePath, getImagePath } from './utils';
 
 interface LightboxProps {

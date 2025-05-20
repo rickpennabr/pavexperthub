@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import ProductsSearchFilter from '@/components/custom/productspage/products-search-filter/ProductsSearchFilter';
+import ProductsSearchFilter from '@/components/custom/products-page/products-search-filter/ProductsSearchFilter';
 import PageContainer from '@/components/layout/PageContainer';
 import { FilterProvider } from '@/context/filter-context';
 

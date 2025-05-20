@@ -11,7 +11,7 @@ export default function Logo() {
   return (
     <Link href="/">
       <Image
-        src="/images/logo/PavExpertsLogo.png"
+        src="/images/logo/pav-expert-hub-logo.png"
         alt="PavExperts Logo"
         width={150}
         height={150}

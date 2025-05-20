@@ -16,7 +16,7 @@ import { useState, useEffect } from "react";
 export default function BlogSearchFilterWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [isClient, setIsClient] = useState(false);
-  const isBlogPage = pathname === '/expertblog' || pathname.startsWith('/expertblog/');
+  const isBlogPage = pathname === '/expert-blog' || pathname.startsWith('/expert-blog/');
 
   useEffect(() => {
     setIsClient(true);
