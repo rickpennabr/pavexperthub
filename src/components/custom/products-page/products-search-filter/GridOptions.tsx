@@ -15,20 +15,10 @@ import { useFilters } from "@/context/filter-context";
 export default function GridOptions() {
   const { viewMode, setViewMode } = useFilters();
 
-  // Set initial view based on screen size
+  // Set initial view based on screen size (only once on mount)
   useEffect(() => {
-    const handleResize = () => {
-      setViewMode(window.innerWidth >= 640 ? 'grid' : 'list'); // 640px is the sm breakpoint
-    };
-
-    // Set initial value
-    handleResize();
-
-    // Add event listener
-    window.addEventListener('resize', handleResize);
-
-    // Cleanup
-    return () => window.removeEventListener('resize', handleResize);
+    setViewMode(window.innerWidth >= 640 ? 'grid' : 'list');
+    // No resize event listener, only set once
   }, [setViewMode]);
 
   return (

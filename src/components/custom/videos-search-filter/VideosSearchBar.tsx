@@ -33,7 +33,7 @@ export default function VideosSearchBar({ searchText, onSearchChange }: VideosSe
         value={searchText}
         onChange={(e) => onSearchChange(e.target.value)}
         placeholder="Find Expert Videos..."
-        className="w-full outline-none text-sm"
+        className="w-full outline-none text-sm text-base"
       />
       {searchText && (
         <button

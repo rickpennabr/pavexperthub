@@ -34,7 +34,7 @@ export default function BlogSearchBar({ searchText, onSearchChange }: BlogSearch
         value={searchText}
         onChange={(e) => onSearchChange(e.target.value)}
         placeholder="Find Expert Blog Posts..."
-        className="w-full outline-none text-sm"
+        className="w-full outline-none text-sm text-base"
       />
       {searchText && (
         <button
