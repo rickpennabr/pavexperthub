@@ -26,7 +26,7 @@ export default function VideosSearchBar({ searchText, onSearchChange }: VideosSe
   };
 
   return (
-    <div className="flex items-center gap-2 h-10 border-2 border-red-500 rounded-md px-3">
+    <div className="flex-1 flex items-center gap-2 h-10 border-2 border-red-500 rounded-md rounded-lg px-3">
       <Search className="w-5 h-5 text-red-500" />
       <input
         type="text"

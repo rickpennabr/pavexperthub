@@ -49,7 +49,7 @@ export default function ServicesSearchFilter() {
   return (
     <section className="w-full">
       {/* Mobile Layout */}
-      <div className="md:hidden flex p-2 bg-white border-b border-black">
+      <div className="md:hidden flex p-2 bg-white border-b border-black rounded-lg">
         <div 
           ref={searchContainerRef}
           className="flex-1"
@@ -59,7 +59,7 @@ export default function ServicesSearchFilter() {
       </div>
 
       {/* Desktop Layout */}
-      <div className="hidden md:flex h-[60px] p-1 items-center gap-4 bg-white border-b border-black">
+      <div className="hidden md:flex h-[60px] p-1 items-center gap-4 bg-white border-b border-black rounded-lg">
         <div 
           ref={searchContainerRef}
           className="flex-1"

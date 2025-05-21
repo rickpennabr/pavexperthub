@@ -275,13 +275,13 @@ export default function EstimatePage() {
   }
 
   return (
-    <div className="w-full bg-white rounded-lg py-2 px-1 sm:px-30 sm:py-5">
+    <div className="w-full h-full min-h-0 flex flex-col flex-1 bg-white rounded-lg py-2 px-1 sm:px-30 sm:py-5">
       <h2 className="text-3xl font-bold text-black mb-4 sm:mb-8 text-center">Get a Free Estimate 😊</h2>
-      <form onSubmit={handleSubmit(onSubmit)} className="w-full space-y-4 sm:space-y-6">
+      <form onSubmit={handleSubmit(onSubmit)} className="w-full space-y-4 sm:space-y-6 flex-none">
         {currentStep === 1 ? (
           <>
             {/* Step 1: Contact Information */}
-            <div className="space-y-4 sm:space-y-6">
+            <div className="space-y-4 sm:space-y-6 flex-1">
               {/* Referral Source */}
               <div className="w-full">
                 <div className="flex items-center gap-2 mb-1">

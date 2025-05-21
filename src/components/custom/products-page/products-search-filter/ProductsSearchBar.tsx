@@ -24,7 +24,7 @@ export default function ProductsSearchBar({ onFocus }: ProductsSearchBarProps) {
   };
 
   return (
-    <div className="relative w-full">
+    <div className="relative w-full rounded-lg">
       <div className="relative h-10">
         <input
           ref={inputRef}

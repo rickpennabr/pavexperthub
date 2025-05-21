@@ -70,8 +70,8 @@ function ProductsGrid() {
   return (
     <div className={`${
       viewMode === 'grid' 
-        ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 md:gap-x-2.5 md:gap-y-2.5 gap-y-3 gap-x-2 md:px-2.5 px-2 pb-2.5' 
-        : 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 md:gap-x-2 md:gap-y-3 gap-y-2 gap-x-1 md:px-1 px-1 md:pb-4 pb-5'
+        ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 md:gap-x-2.5 md:gap-y-2.5 gap-y-3 gap-x-2 pb-2.5' 
+        : 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 md:gap-x-2 md:gap-y-3 gap-y-2 gap-x-1 md:pb-4 pb-5'
     }`}>
       {paginatedProducts.map((product) => (
         <ProductGridItem 

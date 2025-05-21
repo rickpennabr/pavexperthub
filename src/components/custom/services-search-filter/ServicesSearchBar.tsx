@@ -23,7 +23,7 @@ export default function ServicesSearchBar({ onFocus }: ServicesSearchBarProps) {
   };
 
   return (
-    <div className="relative w-full">
+    <div className="relative w-full rounded-lg">
       <div className="relative">
         <input
           ref={inputRef}

@@ -11,18 +11,23 @@ import { Lightbox } from './Lightbox';
 import { ColorImages } from './ColorImages';
 import { ProjectImages } from './ProjectImages';
 import { getPlaceholderType, generatePlaceholders } from './utils';
+import BrandsCardLogo from '../BrandsCardLogo';
 
 // Component props interface
 interface ProductDetailImageSectionProps {
   mainImage: string;
   projectImages: string[];
   colorImages: string[];
+  productName: string;
+  brand: string;
 }
 
 const ProductDetailImageSection: React.FC<ProductDetailImageSectionProps> = ({ 
   mainImage, 
   projectImages, 
-  colorImages
+  colorImages,
+  productName,
+  brand
 }) => {
   // Process and limit images to exactly 10 for each category
   const allProjectImages = useMemo(() => {
@@ -102,6 +107,19 @@ const ProductDetailImageSection: React.FC<ProductDetailImageSectionProps> = ({
 
   return (
     <div className="relative w-full h-full">
+      {/* Mobile Top Bar: Product Name, Brand Name, Brand Logo */}
+      <div className="md:hidden w-full flex items-center justify-between px-3 pt-3 pb-2 bg-white border-b border-gray-200">
+        <div className="flex flex-col min-w-0 text-left">
+          <span className="font-bold text-base text-black truncate">{productName}</span>
+          <span className="text-xs text-gray-500 truncate">{brand}</span>
+        </div>
+        <div className="flex-shrink-0 ml-3">
+          <div className="w-8 h-8 flex items-center justify-center">
+            <BrandsCardLogo brand={brand} size="sm" />
+          </div>
+        </div>
+      </div>
+
       {/* Desktop Layout */}
       <div className="hidden md:block w-full h-full">
         {/* Main Image Container */}
@@ -175,7 +193,7 @@ const ProductDetailImageSection: React.FC<ProductDetailImageSectionProps> = ({
       </div>
 
       {/* Mobile Layout */}
-      <div className="md:hidden w-full">
+      <div className="md:hidden w-full flex flex-col">
         {/* Main Image */}
         <div className="w-full h-[220px] flex items-center justify-center bg-gray-50 relative">
           <div className="w-full h-full max-w-full max-h-full flex items-center justify-center relative">
@@ -227,45 +245,72 @@ const ProductDetailImageSection: React.FC<ProductDetailImageSectionProps> = ({
           </button>
         </div>
         
-        {/* Color Images Row (vertical on mobile) */}
-        <div className="w-full h-[60px] bg-white px-2 py-1 border-t border-gray-100 flex flex-row">
-          <div className="flex flex-col items-center justify-center mr-2 select-none" style={{minWidth: 32}}>
-            <span className="text-[8px] font-bold text-red-600 tracking-tight whitespace-nowrap" style={{letterSpacing: '0.5px'}}>
-              COLORS AVAILABLE
-            </span>
-          </div>
-          <div className="flex flex-col items-center overflow-y-auto h-full w-full scrollbar-thin scrollbar-thumb-red-600 scrollbar-track-transparent [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full gap-y-6 pt-1">
-            {allColorImages.map((img, idx) => {
-              const type = getPlaceholderType(img) || 'PC';
-              return (
-                <div key={idx} className="flex items-center justify-center flex-shrink-0">
-                  <button
-                    className="w-[28px] h-[28px] flex items-center justify-center focus:outline-none bg-transparent p-0"
-                    style={{ background: 'none' }}
-                    onClick={() => setDisplayedImage(img)}
-                    tabIndex={0}
-                    aria-label={`Color image ${idx+1}`}
-                  >
-                    <DiamondImage 
-                      src={img} 
-                      alt={`Color ${idx+1}`} 
-                      active={displayedImage === img} 
-                      type={type as 'PI' | 'PC'} 
-                    />
-                  </button>
-                </div>
-              );
-            })}
+        {/* Color Images Row */}
+        <div className="w-full h-[60px] bg-white px-2 py-1 border-t border-gray-100">
+          <div className="flex items-center h-full">
+            <div className="flex flex-col items-start justify-center mr-2 select-none md:[style:min-width:90px]">
+              <span className="text-[10px] font-bold text-red-600 tracking-tight break-words text-left" style={{letterSpacing: '0.5px', maxWidth: 70}}>
+                COLORS AVAILABLE
+              </span>
+            </div>
+            <div className="flex flex-row items-center overflow-x-auto h-full w-full scrollbar-thin scrollbar-thumb-red-600 scrollbar-track-gray-200 [&::-webkit-scrollbar]:h-2.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-thumb]:bg-red-600 [&::-webkit-scrollbar-track]:bg-gray-200 gap-x-7 pl-3">
+              {allColorImages.map((img, idx) => {
+                const type = getPlaceholderType(img) || 'PC';
+                return (
+                  <div key={idx} className="flex items-center justify-center flex-shrink-0">
+                    <button
+                      className="w-[28px] h-[28px] flex items-center justify-center focus:outline-none bg-transparent p-0"
+                      style={{ background: 'none' }}
+                      onClick={() => setDisplayedImage(img)}
+                      tabIndex={0}
+                      aria-label={`Color image ${idx+1}`}
+                    >
+                      <DiamondImage 
+                        src={img} 
+                        alt={`Color ${idx+1}`} 
+                        active={displayedImage === img} 
+                        type={type as 'PI' | 'PC'} 
+                      />
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </div>
 
-        {/* Project Images Row (horizontal on mobile) */}
+        {/* Project Images Row */}
         <div className="w-full h-[60px] bg-white px-2 py-1 border-t border-gray-100">
-          <ProjectImages
-            images={allProjectImages}
-            displayedImage={displayedImage}
-            onImageSelect={setDisplayedImage}
-          />
+          <div className="flex items-center h-full">
+            <div className="flex flex-col items-start justify-center mr-2 select-none md:[style:min-width:90px]">
+              <span className="text-[10px] font-bold text-red-600 tracking-tight break-words text-left" style={{letterSpacing: '0.5px', maxWidth: 70}}>
+                PROJECT IMAGES
+              </span>
+            </div>
+            <div className="flex flex-row items-center overflow-x-auto h-full w-full scrollbar-thin scrollbar-thumb-red-600 scrollbar-track-gray-200 [&::-webkit-scrollbar]:h-2.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-thumb]:bg-red-600 [&::-webkit-scrollbar-track]:bg-gray-200 gap-x-7 pl-3">
+              {allProjectImages.map((img, idx) => {
+                const type = getPlaceholderType(img) || 'PI';
+                return (
+                  <div key={idx} className="flex items-center justify-center flex-shrink-0">
+                    <button
+                      className="w-[28px] h-[28px] flex items-center justify-center focus:outline-none bg-transparent p-0"
+                      style={{ background: 'none' }}
+                      onClick={() => setDisplayedImage(img)}
+                      tabIndex={0}
+                      aria-label={`Project image ${idx+1}`}
+                    >
+                      <DiamondImage 
+                        src={img} 
+                        alt={`Project ${idx+1}`} 
+                        active={displayedImage === img} 
+                        type={type as 'PI' | 'PC'} 
+                      />
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
         </div>
       </div>
 

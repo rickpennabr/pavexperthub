@@ -47,8 +47,8 @@ export default function MainMenu() {
 
   return (
     <>
-      <nav className="w-full h-[60px] py-2 px-1 bg-black text-white overflow-x-auto sm:overflow-x-visible">
-        <ul className="flex justify-start sm:justify-around items-center h-full px-1 sm:px-4 min-w-[500px] sm:min-w-0 sm:w-full gap-4">
+      <nav className="w-full h-[60px] py-2 bg-black text-white overflow-x-auto sm:overflow-x-visible">
+        <ul className="flex justify-start sm:justify-around items-center h-full sm:px-4 min-w-[500px] sm:min-w-0 sm:w-full gap-4">
           {menuItems.map((item) => {
             const isActive = activeItem === item.id;
 

@@ -34,7 +34,7 @@ export default function ProductsSearchFilter() {
   return (
     <section className="w-full">
       {/* Mobile Layout */}
-      <div className="md:hidden flex flex-col gap-2 p-2 bg-white border-b border-black">
+      <div className="md:hidden flex flex-col gap-2 p-2 bg-white border-b border-black rounded-lg">
         <div className={`flex flex-col ${isExpanded ? 'gap-2' : 'gap-0'}`}>
           <div className="flex items-center justify-between h-8 relative">
             <h2 className="text-sm font-bold text-gray-900 leading-none m-0 p-0 flex items-center h-full">
@@ -73,7 +73,7 @@ export default function ProductsSearchFilter() {
       </div>
 
       {/* Desktop Layout */}
-      <div className="hidden md:flex h-[60px] p-1 items-center gap-4 bg-white border-b border-black">
+      <div className="hidden md:flex h-[60px] p-1 items-center gap-4 bg-white border-b border-black rounded-lg">
         <div className="flex-1">
           <ProductsSearchBar />
         </div>

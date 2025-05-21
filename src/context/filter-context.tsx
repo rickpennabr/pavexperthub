@@ -46,34 +46,10 @@ export function FilterProvider({ children }: { children: ReactNode }) {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [isLoading, setIsLoading] = useState(true);
 
-  // Set initial view mode based on screen size
-  useEffect(() => {
-    const handleResize = () => {
-      // Use list view for mobile (screen width < 640px) and grid view for larger screens
-      if (window.innerWidth < 640) {
-        setViewMode('list');
-      } else {
-        setViewMode('grid');
-      }
-    };
-
-    // Set initial view mode
-    handleResize();
-
-    // Update view mode when window is resized
-    window.addEventListener('resize', handleResize);
-    
-    // Clean up event listener
-    return () => {
-      window.removeEventListener('resize', handleResize);
-    };
-  }, []);
-
   // Initialize filters
   useEffect(() => {
     setIsLoading(true);
     try {
-      // Load any saved filters from localStorage if needed
       const savedFilters = localStorage.getItem('filters');
       if (savedFilters) {
         setFilters(JSON.parse(savedFilters));

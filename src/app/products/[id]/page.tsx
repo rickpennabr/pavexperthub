@@ -65,13 +65,15 @@ export default function ProductDetailPage() {
 
       <div className="bg-white rounded-lg shadow-lg overflow-hidden max-w-[1000px] mx-auto">
         {/* Container with fixed height */}
-        <div className="flex flex-col md:flex-row h-[500px]">
+        <div className="flex flex-col md:flex-row h-full md:h-[500px]">
           {/* Image section - fixed height */}
           <div className="w-full md:w-[45%] md:min-w-[45%] bg-gray-50 h-full">
             <ProductDetailImageSection
               mainImage={productData.product_image_thumbnail}
               projectImages={productData.product_project_images || []}
               colorImages={productData.product_color_images || []}
+              productName={productData.product_name}
+              brand={productData.brand}
             />
           </div>
           

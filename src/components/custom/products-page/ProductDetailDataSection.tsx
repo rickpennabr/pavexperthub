@@ -81,7 +81,7 @@ const ProductDetailDataSection: React.FC<ProductDetailDataSectionProps> = ({
   return (
     <div className="w-full h-full flex flex-col">
       {/* Product name and brand logo header */}
-      <div className="flex justify-between items-center p-3 md:p-5 pb-2 md:pb-3">
+      <div className="hidden md:flex justify-between items-center p-3 md:p-5 pb-2 md:pb-3">
         <div className="flex flex-col justify-center flex-1 min-w-0 mr-3">
           <h2 className="text-xl md:text-2xl font-bold text-black leading-tight truncate">{product_name}</h2>
           <span className="hidden md:block text-base font-semibold text-gray-700 mt-0.5 truncate">{brand}</span>
@@ -92,12 +92,12 @@ const ProductDetailDataSection: React.FC<ProductDetailDataSectionProps> = ({
       </div>
       
       {/* Product data collapsible section with scrolling */}
-      <div className="flex-1 overflow-y-auto px-3 md:px-5">
+      <div className="flex-1 overflow-y-auto px-2 ">
         <div className="space-y-2">
           {/* Product Data Section */}
           <div>
             <button 
-              className="w-full flex items-center justify-between px-3 py-1 md:px-4 md:py-2 bg-black text-white font-medium md:text-base"
+              className="mx-auto w-full flex items-center justify-between px-3 py-1   bg-black text-white font-medium md:text-base"
               onClick={() => setIsSpecsOpen(!isSpecsOpen)}
             >
               <span>Product Data</span>
@@ -108,7 +108,7 @@ const ProductDetailDataSection: React.FC<ProductDetailDataSectionProps> = ({
             
             {/* Specifications table */}
             {isSpecsOpen && (
-              <div className="p-3 md:p-4 border border-t-0 border-gray-200">
+              <div className="p-3 md:p-4 border border-t-0 border-gray-200 mx-auto md:w-full">
                 <table className="w-full border-collapse">
                   <tbody>
                     {pairs.map((pair, index) => (
@@ -145,7 +145,7 @@ const ProductDetailDataSection: React.FC<ProductDetailDataSectionProps> = ({
             
             {/* Description content */}
             {isDescriptionOpen && (
-              <div className="p-3 md:p-4 border border-t-0 border-gray-200">
+              <div className="p-3 md:p-4 border border-t-0 border-gray-200 mx-auto md:w-full">
                 <p className="text-xs md:text-sm text-gray-700 leading-relaxed">{product_note}</p>
               </div>
             )}
@@ -154,7 +154,7 @@ const ProductDetailDataSection: React.FC<ProductDetailDataSectionProps> = ({
           {/* Resources Section */}
           <div>
             <button 
-              className="w-full flex items-center justify-between px-3 py-1 md:px-4 md:py-2 bg-black text-white font-medium md:text-base"
+              className="w-full flex items-center justify-between px-3 py-1  md:py-2 bg-black text-white font-medium md:text-base"
               onClick={() => setIsResourcesOpen(!isResourcesOpen)}
             >
               <span>Resources</span>
@@ -165,7 +165,7 @@ const ProductDetailDataSection: React.FC<ProductDetailDataSectionProps> = ({
             
             {/* Resources content */}
             {isResourcesOpen && (
-              <div className="p-3 md:p-4 border border-t-0 border-gray-200">
+              <div className="p-3 md:p-4 border border-t-0 border-gray-200 mx-auto md:w-full">
                 <p className="text-xs md:text-sm text-gray-700 leading-relaxed">Downloadable resources coming soon...</p>
               </div>
             )}

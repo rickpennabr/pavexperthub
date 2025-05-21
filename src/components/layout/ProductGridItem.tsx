@@ -53,7 +53,7 @@ const ProductGridItem: React.FC<ProductGridItemProps> = ({ product, viewMode }) 
       <div className={`${
         viewMode === 'list' 
           ? 'w-[30%] flex-shrink-0 h-full flex items-center justify-center' 
-          : 'w-full aspect-[2/1.5] max-h-[220px] flex items-center justify-center'
+          : 'w-full aspect-[2/1.5] max-h-[400px] flex items-center justify-center'
       } bg-gray-100 relative overflow-hidden`}>
         {product.product_image_thumbnail && product.product_image_thumbnail.startsWith('/') ? (
           <Image

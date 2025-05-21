@@ -26,7 +26,7 @@ export const ProjectImages: React.FC<ProjectImagesProps> = ({ images, displayedI
           PROJECT IMAGES
         </span>
       </div>
-      <div className="flex flex-row items-center overflow-x-auto h-full w-full scrollbar-thin scrollbar-thumb-red-600 scrollbar-track-transparent [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full gap-x-7 pl-3">
+      <div className="flex flex-row items-center overflow-x-auto h-full w-full scrollbar-thin scrollbar-thumb-red-600 scrollbar-track-gray-200 [&::-webkit-scrollbar]:h-2.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-thumb]:bg-red-600 [&::-webkit-scrollbar-track]:bg-gray-200 gap-x-7 pl-3 py-0.5">
         {images.map((img, idx) => {
           const type = getPlaceholderType(img) || 'PI';
           return (

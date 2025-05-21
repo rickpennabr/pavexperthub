@@ -58,7 +58,7 @@ export default function BlogSearchFilter() {
   }
 
   return (
-    <section className="w-full bg-white border-b border-black">
+    <section className="w-full bg-white border-b border-black rounded-lg">
       {/* Mobile Layout */}
       <div className="sm:hidden flex items-center gap-2 p-2">
         <div className="flex-1">
