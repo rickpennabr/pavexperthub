@@ -180,8 +180,16 @@ Images: ${validatedData.images?.length ? validatedData.images.join('\n') : 'No i
         console.log('Email notifications sent successfully');
       } catch (error) {
         console.error('Error sending email notifications:', error);
-        if (error && typeof error === 'object' && 'response' in error) {
-          console.error('SendGrid response:', (error as { response: { body: unknown } }).response.body);
+        if (error && typeof error === 'object') {
+          if ('response' in error) {
+            console.error('SendGrid response:', (error as { response: { body: unknown } }).response.body);
+          }
+          if ('message' in error) {
+            console.error('Error message:', (error as { message: string }).message);
+          }
+          if ('code' in error) {
+            console.error('Error code:', (error as { code: string | number }).code);
+          }
         }
         // Don't fail the request if email fails
       }
