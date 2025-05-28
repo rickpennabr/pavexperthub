@@ -1,84 +1,33 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useEffect, useState } from "react";
 import { useFilters } from "@/context/filter-context";
-import Link from "next/link";
-
-const services = [
-  {
-    name: "Pavers Installation",
-    description:
-      "Our expert team provides top-quality paver installation for driveways, pool decks, backyards, patios, walkways, and more. The price includes professional installation and base sand.",
-    link: "/services/pavers-installation",
-    price: "$3.50 - $5.00 per square foot",
-  },
-  {
-    name: "Porcelain Installation",
-    description:
-      "Our skilled technicians offer premium porcelain tile installation for indoor and outdoor spaces. The price includes expert installation, adhesive, and grout materials.",
-    link: "/services/porcelain-installation",
-    price: "$5.50 - $9.50 per square foot",
-  },
-  {
-    name: "Travertine Installation",
-    description:
-      "We specialize in elegant travertine installation for patios, pool decks, and outdoor living areas. The price includes professional installation, base materials, and sealing.",
-    link: "/services/travertine-installation",
-    price: "$5.00 - $9.00 per square foot",
-  },
-  {
-    name: "Pavers Repair",
-    description:
-      "Our team offers expert repair services for damaged or settled pavers in driveways, patios, and walkways. The price includes assessment, necessary materials, and professional repair work.",
-    link: "/services/pavers-repair",
-    price: "Starts at $150",
-  },
-  {
-    name: "Paver Sealing",
-    description:
-      "We provide high-quality sealing services to protect and enhance your paver surfaces. The price includes thorough cleaning, professional-grade sealant application, and finish inspection.",
-    link: "/services/paver-sealing",
-    price: "$1.00 - $3.50 per square foot",
-  },
-  {
-    name: "Coping Installation",
-    description:
-      "Our experts offer precise coping installation for pools, raised patios, and other elevated surfaces. The price includes materials, custom cutting, and professional installation.",
-    link: "/services/coping-installation",
-    price: "$25.00 - $45.00 per square foot",
-  },
-  {
-    name: "Decorative Wall Installation",
-    description:
-      "We create stunning decorative walls for landscapes and outdoor living spaces. The price includes design consultation, materials, and expert construction.",
-    link: "/services/decorative-wall-installation",
-    price: "$20.00 - $25.00 per square foot",
-  },
-  {
-    name: "Turf Installation",
-    description:
-      "Our team provides professional installation of high-quality artificial turf for lawns, play areas, and sports surfaces. The price includes site preparation, premium turf materials, and expert installation.",
-    link: "/services/turf-installation",
-    price: "$3.00 - $4.50 per square foot",
-  },
-  {
-    name: "Rock Spreading",
-    description:
-      "We offer efficient and aesthetic rock spreading services for landscaping and ground cover. The price includes material selection, site preparation, and professional spreading.",
-    link: "/services/rock-spreading",
-    price: "Starts at $1.00 per square foot",
-  },
-  {
-    name: "Drainage Installation",
-    description:
-      "Our experts provide comprehensive drainage system installation to prevent water damage and improve landscape health. The price includes site assessment, materials, and professional installation.",
-    link: "/services/drainage-installation",
-    price: "Starts at $4.00 per square foot",
-  },
-];
+import { useRouter } from "next/navigation";
+import { Service, getServices } from "@/services/serviceService";
 
 export default function ServicesPage() {
+  const router = useRouter();
   const { searchText } = useFilters();
+  const [services, setServices] = useState<Service[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  
+  useEffect(() => {
+    const fetchServices = async () => {
+      try {
+        const data = await getServices();
+        setServices(data);
+        setError(null);
+      } catch (err) {
+        console.error('Error fetching services:', err);
+        setError('Failed to load services. Please try again later.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchServices();
+  }, []);
   
   const filteredServices = useMemo(() => {
     let filtered = services;
@@ -94,7 +43,26 @@ export default function ServicesPage() {
     }
 
     return filtered;
-  }, [searchText]);
+  }, [searchText, services]);
+
+  if (isLoading) {
+    return (
+      <div className="w-full min-h-screen bg-black flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-500 mx-auto"></div>
+          <p className="mt-2 text-white">Loading services...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="w-full min-h-screen bg-black flex items-center justify-center">
+        <div className="text-red-500 text-lg">{error}</div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full min-h-screen bg-black flex flex-col">
@@ -105,10 +73,10 @@ export default function ServicesPage() {
             <div className="col-span-full text-center text-gray-400 text-lg py-12">No services found.</div>
           ) : (
             filteredServices.map((service) => (
-              <Link
-                key={service.name}
-                href={service.link}
-                className="block bg-white rounded-lg shadow-md hover:shadow-lg transition-all duration-300 p-2 border border-gray-100 hover:border-red-400 group hover:scale-[1.01]"
+              <button
+                key={service.id}
+                onClick={() => router.push('/estimate')}
+                className="block w-full text-left bg-white rounded-lg shadow-md hover:shadow-lg transition-all duration-300 p-2 border border-gray-100 hover:border-red-400 group hover:scale-[1.01] cursor-pointer"
               >
                 <div className="flex flex-col h-full justify-between">
                   <div>
@@ -121,7 +89,7 @@ export default function ServicesPage() {
                     </span>
                   </div>
                 </div>
-              </Link>
+              </button>
             ))
           )}
         </div>

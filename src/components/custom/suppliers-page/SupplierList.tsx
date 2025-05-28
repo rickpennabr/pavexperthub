@@ -49,14 +49,14 @@ const SupplierList = ({
                           ? 'text-black md:text-white'
                           : 'text-black md:text-white'
                       }`}>
-                        {supplier.name.charAt(0)}
+                        {supplier.supplier_name.charAt(0)}
                       </span>
                     </div>
-                    <h3 className="font-semibold">{supplier.name}</h3>
+                    <h3 className="font-semibold">{supplier.supplier_name}</h3>
                   </div>
                   <p className="text-sm opacity-80">{supplier.address}</p>
                   <div className="flex flex-wrap gap-1 mt-2">
-                    {supplier.types.map((type) => (
+                    {supplier.types.map((type: string) => (
                       <span 
                         key={type}
                         className={`text-xs px-2 py-1 rounded-md transition-colors duration-300 ${

@@ -1,17 +1,46 @@
+export interface BrandLogo {
+  id: string;
+  logo_url: string;
+}
+
+export interface HardscapeMaterial {
+  id: string;
+  material_name: string;
+}
+
+export interface SupplierWebsite {
+  website_url: string;
+}
+
 export interface Supplier {
   id: string;
-  supplier_id: string;
-  name: string;
-  address: string;
-  lat: number;
-  lng: number;
+  supplier_name: string;
+  brand_logos: BrandLogo[];
+  website?: SupplierWebsite[];
+  address?: string;
   types: string[];
-  category?: string;
-  subcategory?: string;
-  description?: string;
+}
+
+export interface SupplierMaterial {
+  hardscape_material: HardscapeMaterial;
+}
+
+export interface Branch {
+  id: string;
+  cross_street: string;
+  branch_name: string;
   phone?: string;
-  website?: string;
-  created_at: string;
-  updated_at: string;
-  user_id?: string;
-} 
+  address?: string;
+  supplier: Supplier;
+  materials: SupplierMaterial[];
+}
+
+export interface TransformedBranch extends Omit<Branch, 'materials' | 'supplier'> {
+  supplier: {
+    id: string;
+    supplier_name: string;
+    brand_logos: BrandLogo[];
+    materials: HardscapeMaterial[];
+    website_url?: string;
+  };
+}

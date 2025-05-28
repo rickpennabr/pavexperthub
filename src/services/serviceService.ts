@@ -10,23 +10,33 @@ if (!supabaseUrl || !supabaseKey) {
 
 const supabase = createClient(supabaseUrl, supabaseKey)
 
-interface Supplier {
-  supplier_id: string
+export interface Service {
+  id?: string
   name: string
-  address: string
-  lat: number
-  lng: number
-  types: string[]
-  category: string
   description: string
-  phone: string
-  website: string
+  price: string
+  link: string
+  details: string
 }
 
-export async function createSupplier(supplier: Supplier) {
+export async function getServices() {
   const { data, error } = await supabase
-    .from('suppliers')
-    .insert([supplier])
+    .from('services')
+    .select('*')
+    .order('name')
+
+  if (error) {
+    throw error
+  }
+
+  return data as Service[]
+}
+
+// This function is only used by the populate script
+export async function createService(service: Service) {
+  const { data, error } = await supabase
+    .from('services')
+    .insert([service])
     .select()
     .single()
 

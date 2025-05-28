@@ -1,7 +1,7 @@
 /**
- * Contact Form Schema
+ * Estimate Form Schema
  * 
- * This schema defines the structure and validation rules for the contact form.
+ * This schema defines the structure and validation rules for the estimate form.
  * It is used by both the estimate form component and the API route to ensure data consistency.
  * 
  * Key Features:
@@ -11,12 +11,12 @@
  * 
  * Used by:
  * - estimate/page.tsx: For form validation and type safety
- * - api/contact/route.ts: For API request validation
+ * - api/estimate/route.ts: For API request validation
  */
 
 import { z } from 'zod'
 
-export const contactSchema = z.object({
+export const estimateSchema = z.object({
   // Referral source with predefined options
   referral: z.enum(['Facebook', 'Google', 'Instagram', 'Friend', 'Previous Customer', 'Other'], {
     required_error: 'Please select how you heard about us',
@@ -58,4 +58,4 @@ export const contactSchema = z.object({
 );
 
 // TypeScript type derived from the schema for type safety
-export type ContactFormData = z.infer<typeof contactSchema> 
+export type EstimateFormData = z.infer<typeof estimateSchema> 

@@ -14,7 +14,7 @@ interface ContainerProps {
 
 const AppContainer: React.FC<ContainerProps> = ({ children }) => {
   return (
-    <div className="w-full max-w-[1080px] mx-auto bg-black border border-black p-1 flex flex-col flex-1">
+    <div className="w-full min-h-screen max-w-[1080px] mx-auto bg-black border border-black p-1 flex flex-col flex-1">
       {children}
     </div>
   );

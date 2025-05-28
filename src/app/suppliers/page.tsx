@@ -1,54 +1,117 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Search, MapPin, List, Phone, Globe } from 'lucide-react';
-import { Supplier } from '@/types/supplier';
+import { Search, MapPin, List } from 'lucide-react';
 import SearchBarCleaner from '@/components/common/SearchBarCleaner';
-import { getSuppliers } from '@/services/supabaseService';
+import { useFilters } from "@/context/filter-context";
+import { SupplierCard } from '@/components/custom/suppliers-page/SupplierCard';
+import { TransformedBranch, BrandLogo } from '@/types/supplier';
 
 export default function SuppliersPage() {
-  const [searchText, setSearchText] = useState('');
-  const [selectedSupplier, setSelectedSupplier] = useState<Supplier | null>(null);
+  const { searchText, setSearchText } = useFilters();
+  const [selectedBranch, setSelectedBranch] = useState<TransformedBranch | null>(null);
   const [activeTab, setActiveTab] = useState<'list' | 'map'>('list');
-  const [suppliers, setSuppliers] = useState<Supplier[]>([]);
+  const [branches, setBranches] = useState<TransformedBranch[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Fetch suppliers from Supabase
+  // Fetch branches from API
   useEffect(() => {
-    const fetchSuppliers = async () => {
+    const fetchBranches = async () => {
       try {
-        const data = await getSuppliers(searchText);
-        setSuppliers(data);
+        console.log('Fetching branches from API...');
+        const response = await fetch('/api/suppliers');
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || 'Failed to fetch branches');
+        }
+
+        console.log('API Response:', JSON.stringify(data, null, 2));
+
+        // Transform the data to include full storage URLs for logos
+        const branchesWithLogoUrls = data.map((branch: TransformedBranch) => {
+          console.log('Processing branch:', branch.cross_street);
+          console.log('Supplier:', branch.supplier);
+          
+          const transformedBranch = {
+            ...branch,
+            supplier: {
+              ...branch.supplier,
+              brand_logos: branch.supplier.brand_logos?.map((logo: BrandLogo) => {
+                // Log the raw logo_url before transformation
+                console.log('Raw logo_url for', branch.supplier.supplier_name, ':', logo.logo_url);
+                
+                // Only add the prefix if it's not already a full URL
+                let logoUrl;
+                if (logo.logo_url.startsWith('http')) {
+                  logoUrl = logo.logo_url;
+                } else {
+                  // Remove any leading slashes from the logo_url
+                  const cleanLogoUrl = logo.logo_url.replace(/^\/+/, '');
+                  // Use the correct bucket name: brands-logo
+                  logoUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/brands-logo/${cleanLogoUrl}`;
+                  console.log('Constructed URL parts:', {
+                    base: process.env.NEXT_PUBLIC_SUPABASE_URL,
+                    bucket: 'brands-logo',
+                    file: cleanLogoUrl,
+                    full: logoUrl
+                  });
+                }
+                
+                console.log('Final logo URL for', branch.supplier.supplier_name, ':', logoUrl);
+                return {
+                  ...logo,
+                  logo_url: logoUrl
+                };
+              })
+            }
+          };
+          
+          console.log('Transformed branch:', transformedBranch);
+          return transformedBranch;
+        });
+
+        console.log('Final branches data:', JSON.stringify(branchesWithLogoUrls, null, 2));
+        setBranches(branchesWithLogoUrls);
         setError(null);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to fetch suppliers');
+        console.error('Error fetching branches:', err);
+        setError('Failed to load branches. Please try again later.');
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchSuppliers();
-  }, [searchText]);
+    fetchBranches();
+  }, []);
 
   const handleClear = () => {
-    if (searchText) {
-      setSearchText("");
-      inputRef.current?.focus();
+    setSearchText('');
+    if (inputRef.current) {
+      inputRef.current.focus();
     }
   };
 
   const toggleView = () => {
     setActiveTab(activeTab === 'list' ? 'map' : 'list');
-    if (activeTab === 'list' && suppliers.length > 0) {
-      setSelectedSupplier(suppliers[0]);
+    if (activeTab === 'list' && branches.length > 0) {
+      setSelectedBranch(branches[0]);
     }
   };
 
+  const filteredBranches = branches
+    .sort((a, b) => a.branch_name.localeCompare(b.branch_name))
+    .filter(branch => 
+      branch.supplier.supplier_name.toLowerCase().includes(searchText.toLowerCase()) ||
+      branch.cross_street.toLowerCase().includes(searchText.toLowerCase()) ||
+      branch.branch_name.toLowerCase().includes(searchText.toLowerCase())
+    );
+
   return (
-    <div className="flex flex-col md:flex-row w-full h-[calc(100vh-8rem)] bg-black md:bg-white">
-      {/* Left: Supplier List */}
+    <div className="flex flex-col md:flex-row w-full bg-black md:bg-white">
+      {/* Left: Branch List */}
       <div className="md:w-[30%] w-full bg-black md:bg-white border-r border-gray-200 flex flex-col">       
         {/* Search Container */}
         <div className="p-2 bg-white border-b border-black">
@@ -62,7 +125,7 @@ export default function SuppliersPage() {
               <input
                 ref={inputRef}
                 type="text"
-                placeholder="Search suppliers by name, ID, or address..."
+                placeholder="Search by supplier, branch or location..."
                 className="w-full h-10 pl-10 pr-10 text-base border-2 border-red-500 rounded-md focus:outline-none focus:border-red-600"
                 style={{ height: '40px', maxHeight: '40px', minHeight: '40px' }}
                 value={searchText}
@@ -92,73 +155,42 @@ export default function SuppliersPage() {
           </div>
         </div>
         
-        {/* Suppliers List - Hidden on mobile when Map tab is selected */}
+        {/* Branches List - Hidden on mobile when Map tab is selected */}
         <div className={`flex-1 overflow-y-auto p-2 lg:p-3 ${activeTab === 'map' ? 'hidden md:block' : 'block'}`}>
           {isLoading ? (
             <div className="flex items-center justify-center h-full">
               <div className="text-center">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-500 mx-auto"></div>
-                <p className="mt-2 text-gray-600">Loading suppliers...</p>
+                <p className="mt-2 text-gray-600">Loading branches...</p>
               </div>
             </div>
           ) : error ? (
             <div className="text-center text-red-500 p-4">
               <p>{error}</p>
             </div>
-          ) : suppliers.length === 0 ? (
+          ) : filteredBranches.length === 0 ? (
             <div className="text-center text-gray-500 p-4">
-              <p>No suppliers found</p>
+              <p>No branches found</p>
             </div>
           ) : (
-            <div className="space-y-2">
-              {suppliers.map((supplier) => (
-                <div
-                  key={supplier.id}
-                  onClick={() => setSelectedSupplier(supplier)}
-                  className={`p-4 rounded-lg overflow-hidden cursor-pointer hover:scale-[1.01] transition-all duration-300
-                    ${
-                      selectedSupplier?.id === supplier.id
-                        ? 'bg-white border-2 border-black text-black md:bg-black md:text-white'
-                        : 'bg-white text-black md:bg-black md:text-white hover:bg-gray-50 md:hover:bg-gray-800 hover:border-2 hover:border-black'
-                    }`}
-                >
-                  <div className="flex justify-between items-start">
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-lg">{supplier.name}</h3>
-                      <p className="text-sm text-gray-600 md:text-gray-400">{supplier.address}</p>
-                      <div className="mt-2 space-y-1">
-                        {supplier.phone && (
-                          <div className="flex items-center gap-2 text-sm">
-                            <Phone className="h-4 w-4" />
-                            <a href={`tel:${supplier.phone}`} className="hover:underline">
-                              {supplier.phone}
-                            </a>
-                          </div>
-                        )}
-                        {supplier.website && (
-                          <div className="flex items-center gap-2 text-sm">
-                            <Globe className="h-4 w-4" />
-                            <a 
-                              href={supplier.website.startsWith('http') ? supplier.website : `https://${supplier.website}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="hover:underline"
-                            >
-                              {supplier.website}
-                            </a>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
+            <div className="space-y-3">
+              {filteredBranches.map((branch) => (
+                <SupplierCard
+                  key={branch.id}
+                  supplier={branch.supplier}
+                  isSelected={selectedBranch?.id === branch.id}
+                  onClick={() => setSelectedBranch(branch)}
+                  crossStreet={branch.cross_street}
+                  phone={branch.phone}
+                  address={branch.address}
+                />
               ))}
             </div>
           )}
         </div>
       </div>
       
-      {/* Right: Map Container - Hidden on mobile when Suppliers List tab is selected */}
+      {/* Right: Map Container - Hidden on mobile when Branches List tab is selected */}
       <div className={`md:w-[70%] w-full h-full bg-black md:bg-white flex items-center justify-center relative ${activeTab === 'list' ? 'hidden md:flex' : 'flex'}`}>
         <div className="text-center absolute inset-0 flex items-center justify-center">
           <div>
