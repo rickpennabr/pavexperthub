@@ -49,7 +49,7 @@ export default function ServicesPage() {
     return (
       <div className="w-full min-h-screen bg-black flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-500 mx-auto"></div>
+          <div className="mx-auto w-8 h-8 bg-red-500 animate-spin rotate-45 rounded-sm shadow-lg border-2 border-white"></div>
           <p className="mt-2 text-white">Loading services...</p>
         </div>
       </div>
@@ -68,7 +68,7 @@ export default function ServicesPage() {
     <div className="w-full min-h-screen bg-black flex flex-col">
       {/* Services Grid */}
       <div className="flex-1 overflow-x-auto scrollbar-thumb-red-600 scrollbar-track-gray-200 bg-black pt-2" style={{ scrollbarWidth: 'auto', minHeight: 12 }}>
-        <div className={'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 md:gap-x-2.5 md:gap-y-2.5 gap-2 md:px-2.5 px-1 pb-2.5 bg-black'}>
+        <div className={'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 md:gap-x-2.5 md:gap-y-2.5 gap-2 pb-2.5 bg-black'}>
           {filteredServices.length === 0 ? (
             <div className="col-span-full text-center text-gray-400 text-lg py-12">No services found.</div>
           ) : (

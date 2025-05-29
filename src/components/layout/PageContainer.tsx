@@ -14,7 +14,7 @@ interface PageContainerProps {
 
 export default function PageContainer({ children }: PageContainerProps) {
   return (
-    <main className="h-full min-h-[calc(100vh-120px)] flex-1 w-full bg-black overflow-auto">
+    <main className="h-full min-h-[100vh] flex-1 w-full bg-black overflow-auto">
       {children}
     </main>
   );

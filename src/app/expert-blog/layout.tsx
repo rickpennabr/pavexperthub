@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import BlogSearchFilter from '@/components/custom/blog-search-filter/BlogSearchFilter';
+import BlogSearchFilter from '@/components/custom/blog-page/blog-search-filter/BlogSearchFilter';
 import PageContainer from '@/components/layout/PageContainer';
 import { FilterProvider } from '@/context/filter-context';
 

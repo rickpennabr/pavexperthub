@@ -51,13 +51,19 @@ export const SupplierCard: React.FC<SupplierCardProps> = ({
 
   const handleWebsiteClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (supplier.website_url) window.open(supplier.website_url, '_blank');
+    if (supplier.website_url) {
+      let url = supplier.website_url;
+      if (!/^https?:\/\//i.test(url)) {
+        url = 'https://' + url;
+      }
+      window.open(url, '_blank');
+    }
   };
 
   return (
     <div
       onClick={onClick}
-      className={`block w-full text-left rounded-lg shadow-md hover:shadow-lg transition-all duration-300 p-2 border border-gray-100 hover:border-red-400 group hover:scale-[1.01] cursor-pointer ${
+      className={`block w-full text-left rounded-[10px] shadow-md hover:shadow-lg transition-all duration-300 p-2 border border-gray-100 hover:border-red-400 group hover:scale-[1.01] cursor-pointer ${
         isSelected
           ? 'bg-white border-2 border-black text-black md:bg-black md:text-white'
           : 'bg-white text-black md:bg-black md:text-white'
@@ -120,7 +126,7 @@ export const SupplierCard: React.FC<SupplierCardProps> = ({
         {phone && (
           <button
             onClick={handlePhoneClick}
-            className="text-red-500 hover:text-red-600 transition-colors"
+            className="text-red-500 hover:text-red-600 transition-colors cursor-pointer"
             title="Call"
           >
             <Phone size={18} />
@@ -129,7 +135,7 @@ export const SupplierCard: React.FC<SupplierCardProps> = ({
         {address && (
           <button
             onClick={handleMapClick}
-            className="text-red-500 hover:text-red-600 transition-colors"
+            className="text-red-500 hover:text-red-600 transition-colors cursor-pointer"
             title="Open in Maps"
           >
             <MapPin size={18} />
@@ -138,7 +144,7 @@ export const SupplierCard: React.FC<SupplierCardProps> = ({
         {supplier.website_url && (
           <button
             onClick={handleWebsiteClick}
-            className="text-red-500 hover:text-red-600 transition-colors"
+            className="text-red-500 hover:text-red-600 transition-colors cursor-pointer"
             title="Visit Website"
           >
             <Globe size={18} />

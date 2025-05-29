@@ -103,18 +103,23 @@ export default function SuppliersPage() {
 
   const filteredBranches = branches
     .sort((a, b) => a.branch_name.localeCompare(b.branch_name))
-    .filter(branch => 
-      branch.supplier.supplier_name.toLowerCase().includes(searchText.toLowerCase()) ||
-      branch.cross_street.toLowerCase().includes(searchText.toLowerCase()) ||
-      branch.branch_name.toLowerCase().includes(searchText.toLowerCase())
-    );
+    .filter(branch => {
+      const search = searchText.toLowerCase();
+      const supplierNameMatch = branch.supplier.supplier_name.toLowerCase().includes(search);
+      const crossStreetMatch = branch.cross_street.toLowerCase().includes(search);
+      const branchNameMatch = branch.branch_name.toLowerCase().includes(search);
+      const materialMatch = branch.supplier.materials && branch.supplier.materials.some(
+        (mat) => mat.material_name.toLowerCase().includes(search)
+      );
+      return supplierNameMatch || crossStreetMatch || branchNameMatch || materialMatch;
+    });
 
   return (
-    <div className="flex flex-col md:flex-row w-full bg-black md:bg-white">
+    <div className="flex flex-col md:flex-row w-full bg-black md:bg-white h-screen">
       {/* Left: Branch List */}
-      <div className="md:w-[30%] w-full bg-black md:bg-white border-r border-gray-200 flex flex-col">       
+      <div className="md:w-[30%] w-full bg-black md:bg-white border-r border-gray-200 flex flex-col h-full">       
         {/* Search Container */}
-        <div className="p-2 bg-white border-b border-black">
+        <div className="bg-white border-b border-black rounded-[10px] py-2 md:rounded-none px-2 md:px-1">
           {/* Search Bar and Map Button Container */}
           <div className="flex gap-2">
             {/* Search Bar */}
@@ -125,8 +130,8 @@ export default function SuppliersPage() {
               <input
                 ref={inputRef}
                 type="text"
-                placeholder="Search by supplier, branch or location..."
-                className="w-full h-10 pl-10 pr-10 text-base border-2 border-red-500 rounded-md focus:outline-none focus:border-red-600"
+                placeholder="Find all Suppliers and Materials."
+                className="w-full h-10 pl-8 pr-2 text-base border-2 border-red-500 rounded-md focus:outline-none focus:border-red-600 placeholder:text-base md:placeholder:text-xs"
                 style={{ height: '40px', maxHeight: '40px', minHeight: '40px' }}
                 value={searchText}
                 onChange={(e) => setSearchText(e.target.value)}
@@ -156,11 +161,11 @@ export default function SuppliersPage() {
         </div>
         
         {/* Branches List - Hidden on mobile when Map tab is selected */}
-        <div className={`flex-1 overflow-y-auto p-2 lg:p-3 ${activeTab === 'map' ? 'hidden md:block' : 'block'}`}>
+        <div className={`flex-1 overflow-y-auto h-full pt-2 md:px-3 ${activeTab === 'map' ? 'hidden md:block' : 'block'}`}>
           {isLoading ? (
             <div className="flex items-center justify-center h-full">
               <div className="text-center">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-500 mx-auto"></div>
+                <div className="mx-auto w-8 h-8 bg-red-500 animate-spin rotate-45 rounded-sm shadow-lg border-2 border-white"></div>
                 <p className="mt-2 text-gray-600">Loading branches...</p>
               </div>
             </div>
@@ -191,14 +196,19 @@ export default function SuppliersPage() {
       </div>
       
       {/* Right: Map Container - Hidden on mobile when Branches List tab is selected */}
-      <div className={`md:w-[70%] w-full h-full bg-black md:bg-white flex items-center justify-center relative ${activeTab === 'list' ? 'hidden md:flex' : 'flex'}`}>
-        <div className="text-center absolute inset-0 flex items-center justify-center">
-          <div>
+      {activeTab === 'map' && (
+        <div className="md:w-[70%] w-full h-full bg-black md:bg-white flex items-center justify-center relative min-h-[200px]">
+          <div className="text-center w-full flex flex-col items-center justify-center md:absolute md:inset-0">
             <h2 className="text-4xl font-bold text-red-600 mb-3">Map View</h2>
             <p className="text-2xl text-red-500">Coming Soon...</p>
           </div>
         </div>
-      </div>
+      )}
+      {activeTab === 'list' && (
+        <div className="md:w-[70%] w-full h-full bg-black md:bg-white flex items-center justify-center relative min-h-[200px]">
+          {/* You can put your list main area content here if needed */}
+        </div>
+      )}
     </div>
   );
 } 

@@ -9,7 +9,7 @@
 // - Responsive design
 // ============================================================================
 
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback, useRef } from 'react';
 import Image from 'next/image';
 import ProductPlaceholder from '@/components/custom/products-page/product-grid-item/ProductPlaceholder';
 import { isRealImagePath, getImagePath } from './utils';
@@ -35,6 +35,33 @@ export const Lightbox: React.FC<LightboxProps> = ({
     if (e.key === 'ArrowRight') onNavigate('next');
     if (e.key === 'ArrowLeft') onNavigate('prev');
   }, [onClose, onNavigate]);
+
+  // Touch swipe support
+  const touchStartX = useRef<number | null>(null);
+  const touchEndX = useRef<number | null>(null);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    touchEndX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = () => {
+    if (touchStartX.current !== null && touchEndX.current !== null) {
+      const diff = touchStartX.current - touchEndX.current;
+      if (Math.abs(diff) > 50) {
+        if (diff > 0) {
+          onNavigate('next'); // Swiped left
+        } else {
+          onNavigate('prev'); // Swiped right
+        }
+      }
+    }
+    touchStartX.current = null;
+    touchEndX.current = null;
+  };
 
   // Add keyboard event listeners
   useEffect(() => {
@@ -74,7 +101,12 @@ export const Lightbox: React.FC<LightboxProps> = ({
         </svg>
       </button>
       <div className="flex-1 flex items-center justify-center w-full h-full">
-        <div className="relative w-full max-w-4xl h-[70vh] flex items-center justify-center">
+        <div 
+          className="relative w-full max-w-4xl h-[70vh] flex items-center justify-center"
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+        >
           {isRealImagePath(images[currentIndex]) ? (
             <Image
               src={getImagePath(images[currentIndex])}
