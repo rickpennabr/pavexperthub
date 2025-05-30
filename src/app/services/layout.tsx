@@ -1,5 +1,5 @@
 import React from 'react';
-import ServicesSearchFilter from '@/components/custom/service-search-filter/ServicesSearchFilter';
+import ServicesSearchFilter from '@/components/custom/service-page/service-search-filter/ServicesSearchFilter';
 import PageContainer from '@/components/layout/PageContainer';
 import { FilterProvider } from '@/context/filter-context';
 

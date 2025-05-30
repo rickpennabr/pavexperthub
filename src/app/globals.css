@@ -99,3 +99,24 @@ input::placeholder {
     font-size: 9px;
   }
 }
+
+/* Google Maps specific styles */
+.gm-style {
+  font-family: inherit !important;
+}
+
+.map-container {
+  position: relative;
+  z-index: 1;
+  background-color: black;
+}
+
+/* Ensure map controls are visible */
+.gm-control-active {
+  background-color: #1c1c1c !important;
+  border-color: #2c2c2c !important;
+}
+
+.gm-control-active:hover {
+  background-color: #2c2c2c !important;
+}

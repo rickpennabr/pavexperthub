@@ -82,6 +82,7 @@ export const SupplierCard: React.FC<SupplierCardProps> = ({
                 src={supplier.brand_logos[0].logo_url}
                 alt={`${supplier.supplier_name} logo`}
                 fill
+                sizes="32px"
                 className="object-contain w-[90%] h-[90%]"
                 onError={(e) => {
                   console.error('Error loading image for', supplier.supplier_name, ':', e);

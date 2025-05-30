@@ -31,11 +31,22 @@ export interface Branch {
   branch_name: string;
   phone?: string;
   address?: string;
+  latitude?: number;
+  longitude?: number;
+  is_main_branch?: boolean;
   supplier: Supplier;
   materials: SupplierMaterial[];
 }
 
-export interface TransformedBranch extends Omit<Branch, 'materials' | 'supplier'> {
+export interface TransformedBranch {
+  id: string;
+  cross_street: string;
+  branch_name: string;
+  phone: string;
+  address: string;
+  latitude?: number;
+  longitude?: number;
+  is_main_branch?: boolean;
   supplier: {
     id: string;
     supplier_name: string;

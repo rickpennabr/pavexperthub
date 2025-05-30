@@ -6,8 +6,11 @@ import SearchBarCleaner from '@/components/common/SearchBarCleaner';
 import { useFilters } from "@/context/filter-context";
 import { SupplierCard } from '@/components/custom/suppliers-page/SupplierCard';
 import { TransformedBranch, BrandLogo } from '@/types/supplier';
+import { SuppliersMap } from '@/components/custom/suppliers-page/SuppliersMap';
 
 export default function SuppliersPage() {
+  console.log("SuppliersPage component rendered");
+  
   const { searchText, setSearchText } = useFilters();
   const [selectedBranch, setSelectedBranch] = useState<TransformedBranch | null>(null);
   const [activeTab, setActiveTab] = useState<'list' | 'map'>('list');
@@ -73,6 +76,27 @@ export default function SuppliersPage() {
           return transformedBranch;
         });
 
+        // Log branches with coordinates
+        console.log('Branches with coordinates:', branchesWithLogoUrls.map((branch: TransformedBranch) => ({
+          name: branch.supplier.supplier_name,
+          address: branch.address,
+          coordinates: {
+            lat: branch.latitude,
+            lng: branch.longitude
+          }
+        })));
+
+        // Check for branches without coordinates
+        const branchesWithoutCoordinates = branchesWithLogoUrls.filter(
+          (branch: TransformedBranch) => !branch.latitude || !branch.longitude
+        );
+        if (branchesWithoutCoordinates.length > 0) {
+          console.warn('Branches without coordinates:', branchesWithoutCoordinates.map((branch: TransformedBranch) => ({
+            name: branch.supplier.supplier_name,
+            address: branch.address
+          })));
+        }
+
         console.log('Final branches data:', JSON.stringify(branchesWithLogoUrls, null, 2));
         setBranches(branchesWithLogoUrls);
         setError(null);
@@ -95,6 +119,7 @@ export default function SuppliersPage() {
   };
 
   const toggleView = () => {
+    console.log("Toggling view from", activeTab, "to", activeTab === 'list' ? 'map' : 'list');
     setActiveTab(activeTab === 'list' ? 'map' : 'list');
     if (activeTab === 'list' && branches.length > 0) {
       setSelectedBranch(branches[0]);
@@ -111,13 +136,13 @@ export default function SuppliersPage() {
       branch.supplier?.materials?.some(material => 
         (material?.material_name?.toLowerCase() || '').includes(searchLower)
       )
-    );
+  );
   }) || [];
 
   return (
     <div className="flex flex-col md:flex-row w-full bg-black md:bg-white h-screen">
       {/* Left: Branch List */}
-      <div className="md:w-[30%] w-full bg-black md:bg-white border-r border-gray-200 flex flex-col h-full">       
+      <div className="md:w-[30%] w-full bg-black md:bg-white border-r border-gray-200 flex flex-col">       
         {/* Search Container */}
         <div className="bg-white border-b border-black rounded-[10px] py-2 md:rounded-none px-2 md:px-1">
           {/* Search Bar and Map Button Container */}
@@ -161,7 +186,7 @@ export default function SuppliersPage() {
         </div>
         
         {/* Branches List - Hidden on mobile when Map tab is selected */}
-        <div className={`flex-1 overflow-y-auto h-full pt-2 md:px-3 ${activeTab === 'map' ? 'hidden md:block' : 'block'}`}>
+        <div className={`flex-1 overflow-y-auto pt-2 md:px-3 ${activeTab === 'map' ? 'hidden md:block' : 'block'}`}>
           {isLoading ? (
             <div className="flex items-center justify-center h-full">
               <div className="text-center">
@@ -195,20 +220,16 @@ export default function SuppliersPage() {
         </div>
       </div>
       
-      {/* Right: Map Container - Hidden on mobile when Branches List tab is selected */}
-      {activeTab === 'map' && (
-        <div className="md:w-[70%] w-full h-full bg-black md:bg-white flex items-center justify-center relative min-h-[200px]">
-          <div className="text-center w-full flex flex-col items-center justify-center md:absolute md:inset-0">
-            <h2 className="text-4xl font-bold text-red-600 mb-3">Map View</h2>
-            <p className="text-2xl text-red-500">Coming Soon...</p>
-          </div>
+      {/* Right: Map View - Hidden on mobile when List tab is selected */}
+      <div className={`md:w-[70%] w-full h-full ${activeTab === 'list' ? 'hidden md:block' : 'block'}`}>
+        <div className="w-full h-full relative" style={{ minHeight: "500px" }}>
+          <SuppliersMap
+            branches={filteredBranches}
+            selectedBranch={selectedBranch}
+            onMarkerClick={setSelectedBranch}
+          />
         </div>
-      )}
-      {activeTab === 'list' && (
-        <div className="md:w-[70%] w-full h-full bg-black md:bg-white flex items-center justify-center relative min-h-[200px]">
-          {/* You can put your list main area content here if needed */}
-        </div>
-      )}
+      </div>
     </div>
   );
 } 
