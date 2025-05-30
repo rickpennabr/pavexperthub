@@ -16,13 +16,11 @@ export default function ClientLayout({
 
   return (
     <AppContainer>
-      <div className={`h-full ${isProductDetail ? 'hidden md:block' : ''}`}>
+      <div className={isProductDetail ? 'hidden md:block' : ''}>
         <Header />
         <MainMenu />
       </div>
-      <div className="h-full">
-        {children}
-      </div>
+      {children}
     </AppContainer>
   );
 } 

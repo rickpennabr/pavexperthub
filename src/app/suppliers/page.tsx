@@ -101,18 +101,18 @@ export default function SuppliersPage() {
     }
   };
 
-  const filteredBranches = branches
-    .sort((a, b) => a.branch_name.localeCompare(b.branch_name))
-    .filter(branch => {
-      const search = searchText.toLowerCase();
-      const supplierNameMatch = branch.supplier.supplier_name.toLowerCase().includes(search);
-      const crossStreetMatch = branch.cross_street.toLowerCase().includes(search);
-      const branchNameMatch = branch.branch_name.toLowerCase().includes(search);
-      const materialMatch = branch.supplier.materials && branch.supplier.materials.some(
-        (mat) => mat.material_name.toLowerCase().includes(search)
-      );
-      return supplierNameMatch || crossStreetMatch || branchNameMatch || materialMatch;
-    });
+  // Filter branches based on search text
+  const filteredBranches = branches?.filter((branch) => {
+    const searchLower = searchText.toLowerCase();
+    return (
+      (branch.supplier?.supplier_name?.toLowerCase() || '').includes(searchLower) ||
+      (branch.cross_street?.toLowerCase() || '').includes(searchLower) ||
+      (branch.branch_name?.toLowerCase() || '').includes(searchLower) ||
+      branch.supplier?.materials?.some(material => 
+        (material?.material_name?.toLowerCase() || '').includes(searchLower)
+      )
+    );
+  }) || [];
 
   return (
     <div className="flex flex-col md:flex-row w-full bg-black md:bg-white h-screen">

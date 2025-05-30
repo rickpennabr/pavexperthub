@@ -49,7 +49,7 @@ export default function ServicesPage() {
     return (
       <div className="w-full min-h-screen bg-black flex items-center justify-center">
         <div className="text-center">
-          <div className="mx-auto w-8 h-8 bg-red-500 animate-spin rotate-45 rounded-sm shadow-lg border-2 border-white"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-500 mx-auto"></div>
           <p className="mt-2 text-white">Loading services...</p>
         </div>
       </div>
