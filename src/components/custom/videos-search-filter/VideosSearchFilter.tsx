@@ -74,14 +74,14 @@ export default function VideosSearchFilter() {
       {/* Mobile Layout */}
       <div className="sm:hidden flex items-center gap-2 p-2">
         <div className="flex-1">
-          <div className="flex-1 flex items-center gap-2 h-10 border-2 border-red-500 rounded-md rounded-lg px-3">
+          <div className="flex-1 flex items-center gap-2 h-10 border-2 border-red-500 rounded-lg px-3">
             <Search className="w-5 h-5 text-red-500" />
             <input
               type="text"
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
               placeholder="Find Expert Videos..."
-              className="w-full outline-none text-sm text-base"
+              className="w-full outline-none text-base"
             />
             {searchText && (
               <button
@@ -131,14 +131,14 @@ export default function VideosSearchFilter() {
       {/* Desktop Layout */}
       <div className="hidden sm:flex h-[60px] p-1 items-center gap-4">
         <div className="flex-1">
-          <div className="flex-1 flex items-center gap-2 h-10 border-2 border-red-500 rounded-md rounded-lg px-3">
+          <div className="flex-1 flex items-center gap-2 h-10 border-2 border-red-500 rounded-lg px-3">
             <Search className="w-5 h-5 text-red-500" />
             <input
               type="text"
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
               placeholder="Find Expert Videos..."
-              className="w-full outline-none text-sm text-base"
+              className="w-full outline-none text-base"
             />
             {searchText && (
               <button

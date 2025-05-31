@@ -111,12 +111,74 @@ export default function SuppliersPage() {
     fetchBranches();
   }, []);
 
+  // Filter branches based on search only (for list view)
+  const filteredBranches = branches.filter(branch => {
+    return branch.supplier.supplier_name.toLowerCase().includes(searchText.toLowerCase()) ||
+      branch.address.toLowerCase().includes(searchText.toLowerCase()) ||
+      branch.supplier.materials.some(material => 
+        material.material_name.toLowerCase().includes(searchText.toLowerCase())
+      );
+  });
+
+  // Filter branches for map view (based on selection and search)
+  const mapBranches = selectedBranch 
+    ? branches.filter(branch => branch.id === selectedBranch.id)
+    : filteredBranches;
+
+  // Handle clear search
   const handleClear = () => {
     setSearchText('');
     if (inputRef.current) {
       inputRef.current.focus();
     }
   };
+
+  // Handle branch selection
+  const handleBranchSelect = (branch: TransformedBranch | null) => {
+    setSelectedBranch(branch);
+  };
+
+  // Handle escape key press
+  useEffect(() => {
+    const handleEscapeKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && selectedBranch) {
+        setSelectedBranch(null);
+      }
+    };
+
+    window.addEventListener('keydown', handleEscapeKey);
+    return () => window.removeEventListener('keydown', handleEscapeKey);
+  }, [selectedBranch]);
+
+  // Handle search bar click
+  const handleSearchClick = () => {
+    setSelectedBranch(null);
+  };
+
+  // Handle search text change
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchText(e.target.value);
+    setSelectedBranch(null);
+  };
+
+  // Handle document click to clear selection
+  useEffect(() => {
+    const handleDocumentClick = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      // Don't clear if clicking on a list item or its children
+      if (target.closest('.supplier-card')) {
+        return;
+      }
+      // Don't clear if clicking on the map or its children
+      if (target.closest('.map-container')) {
+        return;
+      }
+      setSelectedBranch(null);
+    };
+
+    document.addEventListener('click', handleDocumentClick);
+    return () => document.removeEventListener('click', handleDocumentClick);
+  }, []);
 
   const toggleView = () => {
     console.log("Toggling view from", activeTab, "to", activeTab === 'list' ? 'map' : 'list');
@@ -126,25 +188,12 @@ export default function SuppliersPage() {
     }
   };
 
-  // Filter branches based on search text
-  const filteredBranches = branches?.filter((branch) => {
-    const searchLower = searchText.toLowerCase();
-    return (
-      (branch.supplier?.supplier_name?.toLowerCase() || '').includes(searchLower) ||
-      (branch.cross_street?.toLowerCase() || '').includes(searchLower) ||
-      (branch.branch_name?.toLowerCase() || '').includes(searchLower) ||
-      branch.supplier?.materials?.some(material => 
-        (material?.material_name?.toLowerCase() || '').includes(searchLower)
-      )
-  );
-  }) || [];
-
   return (
     <div className="flex flex-col md:flex-row w-full bg-black md:bg-white h-screen">
       {/* Left: Branch List */}
       <div className="md:w-[30%] w-full bg-black md:bg-white border-r border-gray-200 flex flex-col">       
         {/* Search Container */}
-        <div className="bg-white border-b border-black rounded-[10px] py-2 md:rounded-none px-2 md:px-1">
+        <div className="bg-white border-b border-black rounded-[10px] py-1 md:py-2 px-2 md:px-1">
           {/* Search Bar and Map Button Container */}
           <div className="flex gap-2">
             {/* Search Bar */}
@@ -159,7 +208,8 @@ export default function SuppliersPage() {
                 className="w-full h-10 pl-8 pr-2 text-base border-2 border-red-500 rounded-md focus:outline-none focus:border-red-600 placeholder:text-base md:placeholder:text-xs"
                 style={{ height: '40px', maxHeight: '40px', minHeight: '40px' }}
                 value={searchText}
-                onChange={(e) => setSearchText(e.target.value)}
+                onChange={handleSearchChange}
+                onClick={handleSearchClick}
               />
               {searchText && <SearchBarCleaner onClear={handleClear} />}
             </div>
@@ -205,15 +255,16 @@ export default function SuppliersPage() {
           ) : (
             <div className="space-y-3">
               {filteredBranches.map((branch) => (
-                <SupplierCard
-                  key={branch.id}
-                  supplier={branch.supplier}
-                  isSelected={selectedBranch?.id === branch.id}
-                  onClick={() => setSelectedBranch(branch)}
-                  crossStreet={branch.cross_street}
-                  phone={branch.phone}
-                  address={branch.address}
-                />
+                <div key={branch.id} className="supplier-card">
+                  <SupplierCard
+                    supplier={branch.supplier}
+                    isSelected={selectedBranch?.id === branch.id}
+                    onClick={() => handleBranchSelect(branch)}
+                    crossStreet={branch.cross_street}
+                    phone={branch.phone}
+                    address={branch.address}
+                  />
+                </div>
               ))}
             </div>
           )}
@@ -222,11 +273,11 @@ export default function SuppliersPage() {
       
       {/* Right: Map View - Hidden on mobile when List tab is selected */}
       <div className={`md:w-[70%] w-full h-full ${activeTab === 'list' ? 'hidden md:block' : 'block'}`}>
-        <div className="w-full h-full relative" style={{ minHeight: "500px" }}>
+        <div className="w-full h-full relative mt-2 md:mt-0 rounded-lg overflow-hidden map-container" style={{ minHeight: "500px" }}>
           <SuppliersMap
-            branches={filteredBranches}
+            branches={mapBranches}
             selectedBranch={selectedBranch}
-            onMarkerClick={setSelectedBranch}
+            onMarkerClick={handleBranchSelect}
           />
         </div>
       </div>

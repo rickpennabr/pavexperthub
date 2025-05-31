@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { APIProvider, Map, AdvancedMarker, InfoWindow } from '@vis.gl/react-google-maps';
+import { APIProvider, Map, AdvancedMarker, InfoWindow, MapMouseEvent } from '@vis.gl/react-google-maps';
 import { TransformedBranch } from "@/types/supplier";
 import Image from 'next/image';
 import { Phone, MapPin, Globe } from 'lucide-react';
@@ -51,11 +51,11 @@ const CustomMarker = ({ branch, onClick, isSelected }: {
       <div className={`
         absolute inset-0 
         ${isSelected ? 'bg-red-500 border-red-500' : 'bg-white border-black'} 
-        border-2
+        border-2 md:border-[3px]
       `} />
       
       {/* Logo container */}
-      <div className="absolute inset-1 bg-white overflow-hidden">
+      <div className="absolute inset-1 md:inset-[2px] bg-white overflow-hidden">
         {logoUrl ? (
           <div className="relative w-full h-full transform -rotate-45">
             <Image 
@@ -101,8 +101,9 @@ export function SuppliersMap({
   }, [selectedBranch, onMarkerClick]);
 
   // Handle map click to clear selection
-  const handleMapClick = () => {
-    if (selectedBranch) {
+  const handleMapClick = (e: MapMouseEvent) => {
+    // Only clear if clicking directly on the map (not on markers or info window)
+    if (e?.domEvent?.target && (e.domEvent.target as HTMLElement).tagName === 'DIV') {
       onMarkerClick(null);
       setInfoWindowOpen(false);
     }
@@ -126,17 +127,9 @@ export function SuppliersMap({
   const mapCenter = { lat: 36.1699, lng: -115.1398 };
 
   const handleMarkerClick = (branch: TransformedBranch) => {
-    setInfoWindowOpen(true);
     onMarkerClick(branch);
+    setInfoWindowOpen(true);
   };
-
-  // Reset selection when switching views or when branches change
-  useEffect(() => {
-    if (selectedBranch) {
-      onMarkerClick(null);
-      setInfoWindowOpen(false);
-    }
-  }, [isDesktop, branches, selectedBranch, onMarkerClick]);
 
   return (
     <div className="w-full h-full -mt-2 md:mt-0" style={{ minHeight: "500px" }}>
@@ -200,30 +193,30 @@ export function SuppliersMap({
                     </div>
                   ) : (
                     <div className="w-10 h-10 md:w-12 md:h-12 flex-shrink-0 bg-red-500 rounded-full flex items-center justify-center">
-                      <span className="text-white font-bold text-base md:text-lg">
+                      <span className="text-white font-bold text-lg md:text-lg">
                         {selectedBranch.supplier.supplier_name.charAt(0)}
                       </span>
                     </div>
                   )}
-                  <h3 className="font-bold text-base md:text-lg break-words">{selectedBranch.supplier.supplier_name}</h3>
+                  <h3 className="font-bold text-2xl md:text-2xl break-words">{selectedBranch.supplier.supplier_name}</h3>
                 </div>
 
                 {/* Address and contact info */}
                 <div className="space-y-1.5 md:space-y-2 mb-2 md:mb-3">
                   {selectedBranch.address && (
-                    <p className="text-xs md:text-sm flex items-start gap-1.5 md:gap-2">
+                    <p className="text-base md:text-base flex items-start gap-1.5 md:gap-2">
                       <span className="text-red-500 flex-shrink-0">📍</span>
                       <span className="break-words">{selectedBranch.address}</span>
                     </p>
                   )}
                   {selectedBranch.phone && (
-                    <p className="text-xs md:text-sm flex items-center gap-1.5 md:gap-2">
+                    <p className="text-base md:text-base flex items-center gap-1.5 md:gap-2">
                       <span className="text-red-500 flex-shrink-0">📞</span>
                       <span>{selectedBranch.phone}</span>
                     </p>
                   )}
                   {selectedBranch.cross_street && (
-                    <p className="text-xs md:text-sm flex items-start gap-1.5 md:gap-2">
+                    <p className="text-base md:text-base flex items-start gap-1.5 md:gap-2">
                       <span className="text-red-500 flex-shrink-0">🚦</span>
                       <span className="break-words">Cross Street: {selectedBranch.cross_street}</span>
                     </p>
@@ -233,12 +226,12 @@ export function SuppliersMap({
                 {/* Materials section */}
                 {selectedBranch.supplier.materials && selectedBranch.supplier.materials.length > 0 && (
                   <div className="mt-2 md:mt-3 pt-2 md:pt-3 border-t border-gray-200">
-                    <h4 className="text-xs md:text-sm font-semibold mb-1.5 md:mb-2 text-gray-700">Materials Provided:</h4>
+                    <h4 className="text-base md:text-base font-semibold mb-1.5 md:mb-2 text-gray-700">Materials Provided:</h4>
                     <div className="flex flex-wrap gap-1.5 md:gap-2">
                       {selectedBranch.supplier.materials.map((material) => (
                         <span 
                           key={material.id}
-                          className="px-2 py-0.5 md:px-2 md:py-1 bg-red-100 text-red-700 rounded-full text-xs md:text-xs"
+                          className="px-3 py-1.5 md:px-2 md:py-1 bg-red-100 text-red-700 rounded-full text-base md:text-sm"
                         >
                           {material.material_name}
                         </span>

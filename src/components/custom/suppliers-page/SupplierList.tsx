@@ -1,13 +1,13 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Supplier } from '@/types/supplier';
 import { ChevronRight } from 'lucide-react';
 
 interface SupplierListProps {
   suppliers: Supplier[];
   selectedSupplier: Supplier | null;
-  onSupplierSelect: (supplier: Supplier) => void;
+  onSupplierSelect: (supplier: Supplier | null) => void;
   hasMore: boolean;
   onLoadMore: () => void;
 }
@@ -19,8 +19,22 @@ const SupplierList = ({
   hasMore,
   onLoadMore,
 }: SupplierListProps) => {
+  const listRef = useRef<HTMLDivElement>(null);
+
+  // Handle click outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (listRef.current && !listRef.current.contains(event.target as Node)) {
+        onSupplierSelect(null);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [onSupplierSelect]);
+
   return (
-    <div className="flex-1 overflow-y-auto">
+    <div className="flex-1 overflow-y-auto" ref={listRef}>
       <div className="space-y-2">
         {suppliers.map((supplier) => (
           <div
@@ -44,7 +58,7 @@ const SupplierList = ({
                         ? 'border-black bg-white md:border-white md:bg-black'
                         : 'border-black bg-white md:border-white md:bg-black'
                     }`} style={{ aspectRatio: '1/1' }}>
-                      <span className={`-rotate-45 text-xs font-bold ${
+                      <span className={`-rotate-45 text-sm font-bold ${
                         selectedSupplier?.id === supplier.id
                           ? 'text-black md:text-white'
                           : 'text-black md:text-white'
@@ -52,14 +66,14 @@ const SupplierList = ({
                         {supplier.supplier_name.charAt(0)}
                       </span>
                     </div>
-                    <h3 className="font-semibold">{supplier.supplier_name}</h3>
+                    <h3 className="font-semibold text-xl">{supplier.supplier_name}</h3>
                   </div>
-                  <p className="text-sm opacity-80">{supplier.address}</p>
+                  <p className="text-base opacity-80">{supplier.address}</p>
                   <div className="flex flex-wrap gap-1 mt-2">
                     {supplier.types.map((type: string) => (
                       <span 
                         key={type}
-                        className={`text-xs px-2 py-1 rounded-md transition-colors duration-300 ${
+                        className={`text-sm px-2 py-1 rounded-md transition-colors duration-300 ${
                           selectedSupplier?.id === supplier.id
                             ? 'bg-black text-white md:bg-white md:text-black'
                             : 'bg-black text-white md:bg-white md:text-black'

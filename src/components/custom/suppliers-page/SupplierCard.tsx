@@ -2,6 +2,7 @@ import React from 'react';
 import Image from 'next/image';
 import { Phone, MapPin, Globe } from 'lucide-react';
 import { TransformedBranch } from '@/types/supplier';
+import { useFilters } from '@/context/filter-context';
 
 interface SupplierCardProps {
   supplier: TransformedBranch['supplier'];
@@ -20,9 +21,16 @@ export const SupplierCard: React.FC<SupplierCardProps> = ({
   phone,
   address
 }) => { 
+  const { searchText } = useFilters();
+
   console.log('SupplierCard rendering for:', supplier.supplier_name);
   console.log('Brand logos:', supplier.brand_logos);
   console.log('Logo URL:', supplier.brand_logos?.[0]?.logo_url);
+
+  // Filter materials based on search text
+  const filteredMaterials = supplier.materials.filter(material =>
+    material.material_name.toLowerCase().includes(searchText.toLowerCase())
+  );
 
   const handlePhoneClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -106,10 +114,10 @@ export const SupplierCard: React.FC<SupplierCardProps> = ({
       </div>
 
       {/* Branch Materials Section */}
-      {supplier.materials && supplier.materials.length > 0 && (
+      {filteredMaterials.length > 0 && (
         <div className="pt-2 border-t border-gray-100">
           <div className="flex overflow-x-auto gap-1.5 pb-1 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
-            {supplier.materials.map((material) => (
+            {filteredMaterials.map((material) => (
               <span
                 key={material.id}
                 className="inline-block px-1.5 py-0.5 bg-black md:bg-gray-50 text-white md:text-gray-600 text-[10px] whitespace-nowrap rounded-md border border-gray-200 hover:border-red-400 transition-colors duration-200"
