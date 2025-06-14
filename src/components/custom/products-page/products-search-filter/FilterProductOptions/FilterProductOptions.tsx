@@ -25,43 +25,34 @@
 
 "use client"
 
-import React, { useState, useEffect, useRef } from "react";
-import FilterDropdown from "./FilterDropdown";
-import { useFilters } from "@/context/filter-context";
-import { useFilterOptions } from "@/hooks/useFilterOptions";
-import { getBrands, getProductTypes } from '@/services/productService';
-
-interface FilterState {
-  brand: string;
-  type: string;
-  thickness: string;
-  color: string;
-}
+import React, { useEffect, useState, useRef } from 'react';
+import { getBrands, getProductTypes, getThicknesses, getColors } from '@/services/productService';
+import FilterDropdown from './FilterDropdown';
 
 export default function FilterProductOptions() {
-  // Get filter state and setter from context
-  const { filters, setFilters } = useFilters();
-  
-  // Get filter options from Supabase
-  const { brands: supabaseBrands, types: supabaseTypes, thicknesses, colors, loading } = useFilterOptions();
-  
-  // State for managing which dropdown is currently open
+  const [filters, setFilters] = useState({
+    brand: '',
+    type: '',
+    thickness: '',
+    color: ''
+  });
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
-  
-  // Ref for handling click outside events
-  const dropdownRef = useRef<HTMLDivElement>(null);
-
   const [brands, setBrands] = useState<string[]>([]);
   const [types, setTypes] = useState<string[]>([]);
+  const [thicknesses, setThicknesses] = useState<string[]>([]);
+  const [colors, setColors] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const fetchFilterOptions = async () => {
       try {
         setIsLoading(true);
-        const [brandsResponse, typesResponse] = await Promise.all([
+        const [brandsResponse, typesResponse, thicknessesResponse, colorsResponse] = await Promise.all([
           getBrands(),
-          getProductTypes()
+          getProductTypes(),
+          getThicknesses(),
+          getColors()
         ]);
 
         if (brandsResponse.data) {
@@ -69,6 +60,12 @@ export default function FilterProductOptions() {
         }
         if (typesResponse.data) {
           setTypes(typesResponse.data);
+        }
+        if (thicknessesResponse.data) {
+          setThicknesses(thicknessesResponse.data.map(t => `${t.thickness_mm}mm (${t.thickness_in}")`));
+        }
+        if (colorsResponse.data) {
+          setColors(colorsResponse.data.map(color => color.color_name));
         }
       } catch (error) {
         console.error('Error fetching filter options:', error);
@@ -87,26 +84,21 @@ export default function FilterProductOptions() {
         setOpenDropdown(null);
       }
     };
-    const handleEscape = (event: KeyboardEvent) => {
+
+    const handleEscapeKey = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         setOpenDropdown(null);
       }
     };
+
     document.addEventListener('mousedown', handleClickOutside);
-    document.addEventListener('keydown', handleEscape);
+    document.addEventListener('keydown', handleEscapeKey);
+
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
-      document.removeEventListener('keydown', handleEscape);
+      document.removeEventListener('keydown', handleEscapeKey);
     };
   }, []);
-
-  if (loading) {
-    return (
-      <div className="flex items-center gap-1 sm:gap-2 w-full md:w-auto max-w-full overflow-x-hidden">
-        <div className="animate-pulse bg-gray-200 h-10 w-full rounded-lg"></div>
-      </div>
-    );
-  }
 
   return (
     <div className="flex items-center gap-1 sm:gap-2 w-full md:w-auto max-w-full overflow-x-hidden" ref={dropdownRef}>
@@ -166,6 +158,7 @@ export default function FilterProductOptions() {
             setOpenDropdown(null);
           }}
           options={thicknesses}
+          isLoading={isLoading}
         />
       </div>
 
@@ -185,6 +178,7 @@ export default function FilterProductOptions() {
             setOpenDropdown(null);
           }}
           options={colors}
+          isLoading={isLoading}
         />
       </div>
     </div>

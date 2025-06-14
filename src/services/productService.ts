@@ -174,4 +174,50 @@ export async function getBrands(): Promise<ServiceResponse<{ brand_id: number; b
       error: error instanceof Error ? error.message : 'An unexpected error occurred' 
     };
   }
+}
+
+// Get all unique thicknesses
+export async function getThicknesses(): Promise<ServiceResponse<{ thickness_mm: string; thickness_in: string }[]>> {
+  try {
+    const { data, error } = await supabase
+      .from('thicknesses')
+      .select('thickness_mm, thickness_in')
+      .order('thickness_mm');
+
+    if (error) {
+      console.error('Error fetching thicknesses:', error);
+      return { data: null, error: error.message };
+    }
+
+    return { data, error: null };
+  } catch (error) {
+    console.error('Error in getThicknesses:', error);
+    return { 
+      data: null, 
+      error: error instanceof Error ? error.message : 'An unexpected error occurred' 
+    };
+  }
+}
+
+// Get all unique colors
+export async function getColors(): Promise<ServiceResponse<{ color_id: number; color_name: string }[]>> {
+  try {
+    const { data, error } = await supabase
+      .from('colors')
+      .select('color_id, color_name')
+      .order('color_name');
+
+    if (error) {
+      console.error('Error fetching colors:', error);
+      return { data: null, error: error.message };
+    }
+
+    return { data, error: null };
+  } catch (error) {
+    console.error('Error in getColors:', error);
+    return { 
+      data: null, 
+      error: error instanceof Error ? error.message : 'An unexpected error occurred' 
+    };
+  }
 } 
