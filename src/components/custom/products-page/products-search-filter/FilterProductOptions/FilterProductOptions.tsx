@@ -27,12 +27,15 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import FilterDropdown from "./FilterDropdown";
-import { brands, types, thicknesses, colorOptions } from "./filters-data";
 import { useFilters } from "@/context/filter-context";
+import { useFilterOptions } from "@/hooks/useFilterOptions";
 
 export default function FilterProductOptions() {
   // Get filter state and setter from context
   const { filters, setFilters } = useFilters();
+  
+  // Get filter options from Supabase
+  const { brands, types, thicknesses, colors, loading } = useFilterOptions();
   
   // State for managing which dropdown is currently open
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
@@ -59,6 +62,14 @@ export default function FilterProductOptions() {
       document.removeEventListener('keydown', handleEscape);
     };
   }, []);
+
+  if (loading) {
+    return (
+      <div className="flex items-center gap-1 sm:gap-2 w-full md:w-auto max-w-full overflow-x-hidden">
+        <div className="animate-pulse bg-gray-200 h-10 w-full rounded-lg"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex items-center gap-1 sm:gap-2 w-full md:w-auto max-w-full overflow-x-hidden" ref={dropdownRef}>
@@ -134,7 +145,7 @@ export default function FilterProductOptions() {
             setFilters(prev => ({ ...prev, color: "" }));
             setOpenDropdown(null);
           }}
-          options={colorOptions}
+          options={colors}
         />
       </div>
     </div>

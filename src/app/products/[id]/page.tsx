@@ -1,48 +1,94 @@
 'use client';
 
-import React from 'react';
-import { useParams } from 'next/navigation';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { getProductById } from '@/services/productService';
+import type { ProductWithDetails } from '@/services/productService';
 import ProductDetailImageSection from '@/components/custom/products-page/product-detail-image/ProductDetailImageSection';
 import ProductDetailDataSection from '@/components/custom/products-page/ProductDetailDataSection';
-import { products } from '@/data/products';
 
-export default function ProductDetailPage() {
-  const params = useParams();
-  const productId = params.id as string;
+interface PageParams {
+  id: string;
+}
 
-  // Find the product by ID from the products array
-  const product = products.find(p => p.product_id === productId);
+class ProductErrorBoundary extends React.Component<
+  { children: React.ReactNode },
+  { hasError: boolean }
+> {
+  constructor(props: { children: React.ReactNode }) {
+    super(props);
+    this.state = { hasError: false };
+  }
 
-  // Fallback if product not found
-  const fallbackProduct = {
-    product_id: productId,
-    product_name: "Product Not Found",
-    brand: "Unknown",
-    product_type: "Unknown",
-    color: "Unknown",
-    size: "Unknown",
-    thickness: "Unknown",
-    thickness_in: 0,
-    sqft_pallet: 0,
-    sqft_layer: 0,
-    lnft_pallet: 0,
-    layer_pallet: 0,
-    pcs_pallet: 0,
-    product_note: 'Product information not available.',
-    colors_available: [],
-    thicknesses_available: [],
-    product_image_thumbnail: "Unknown Product",
-    product_project_images: [],
-    product_color_images: []
-  };
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
 
-  // Use product data if found, otherwise fallback
-  const productData = product || fallbackProduct;
+  render() {
+    if (this.state.hasError) {
+      return <div>Something went wrong loading the product.</div>;
+    }
+
+    return this.props.children;
+  }
+}
+
+function ProductDetailContent({ params }: { params: Promise<PageParams> }) {
+  const [supabaseProduct, setSupabaseProduct] = useState<ProductWithDetails | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const resolvedParams = React.use(params);
+
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        const response = await getProductById(resolvedParams.id);
+        if (response.error) {
+          setError(response.error);
+          return;
+        }
+        setSupabaseProduct(response.data);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'An unexpected error occurred');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProduct();
+  }, [resolvedParams.id]);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error || !supabaseProduct) {
+    return <div>Error: {error || 'Product not found'}</div>;
+  }
+
+  // Get the first variant for display
+  const firstVariant = supabaseProduct.variants?.[0];
+  const productName = supabaseProduct.product_name;
+  const brandName = supabaseProduct.brand?.brand_name || '';
+  const color = firstVariant?.color?.color_name || '';
+  const size = firstVariant?.size || '';
+  const thickness = firstVariant?.thickness?.thickness_mm || '';
+  const thicknessIn = firstVariant?.thickness?.thickness_in || '';
+  const sqftPallet = firstVariant?.sqft_pallet || 0;
+  const sqftLayer = firstVariant?.sqft_layer || 0;
+  const lnftPallet = firstVariant?.lnft_pallet || 0;
+  const layerPallet = firstVariant?.layer_pallet || 0;
+  const pcsPallet = firstVariant?.pcs_pallet || 0;
+
+  // Get all color variant images
+  const colorVariantImages = supabaseProduct.variants?.flatMap(variant => 
+    variant.images?.map(img => img.image_path) || []
+  ) || [];
+  const mainImage = colorVariantImages[0] || '';
 
   return (
     <div className="mx-auto p-2">
-      {/* Back Button */}
       <Link 
         href="/products"
         className="inline-flex items-center text-white hover:text-gray-200 md:mb-4 mb-3"
@@ -63,42 +109,58 @@ export default function ProductDetailPage() {
         Back to Products
       </Link>
 
-      <div className="bg-white rounded-lg shadow-lg overflow-hidden max-w-[1000px] mx-auto">
+      <div className="bg-white rounded-lg shadow-lg overflow-hidden w-full h-full">
         {/* Container with fixed height */}
         <div className="flex flex-col md:flex-row h-full md:h-[500px]">
           {/* Image section - fixed height */}
           <div className="w-full md:w-[45%] md:min-w-[45%] bg-gray-50 h-full">
             <ProductDetailImageSection
-              mainImage={productData.product_image_thumbnail}
-              projectImages={productData.product_project_images || []}
-              colorImages={productData.product_color_images || []}
-              productName={productData.product_name}
-              brand={productData.brand}
+              mainImage={mainImage}
+              projectImages={[]}
+              colorImages={colorVariantImages}
+              productName={productName}
+              brand={brandName}
             />
           </div>
-          
-          {/* Product Data Section - scrollable */}
-          <div className="w-full md:w-[55%] h-full overflow-y-auto">
+
+          {/* Data section - scrollable */}
+          <div className="w-full md:w-[55%] h-full">
             <ProductDetailDataSection
-              product_name={productData.product_name}
-              brand={productData.brand}
-              product_type={productData.product_type}
-              color={productData.color}
-              size={productData.size}
-              thickness={productData.thickness}
-              thickness_in={productData.thickness_in}
-              sqft_pallet={productData.sqft_pallet}
-              sqft_layer={productData.sqft_layer}
-              lnft_pallet={productData.lnft_pallet}
-              layer_pallet={productData.layer_pallet}
-              pcs_pallet={productData.pcs_pallet}
-              product_note={productData.product_note}
-              colors_available={productData.colors_available}
-              thicknesses_available={productData.thicknesses_available}
+              product_name={productName}
+              brand={brandName}
+              product_type={supabaseProduct.product_type}
+              color={color}
+              size={size}
+              thickness={thickness}
+              thickness_in={thicknessIn}
+              sqft_pallet={sqftPallet}
+              sqft_layer={sqftLayer}
+              lnft_pallet={lnftPallet}
+              layer_pallet={layerPallet}
+              pcs_pallet={pcsPallet}
+              product_note={supabaseProduct.product_note}
+              colors_available={Array.from(new Set(
+                supabaseProduct.variants
+                  ?.map(v => v.color?.color_name)
+                  .filter((name): name is string => !!name)
+              ))}
+              thicknesses_available={Array.from(new Set(
+                supabaseProduct.variants
+                  ?.map(v => v.thickness?.thickness_mm)
+                  .filter((thickness): thickness is string => !!thickness)
+              ))}
             />
           </div>
         </div>
       </div>
     </div>
+  );
+}
+
+export default function ProductDetailPage({ params }: { params: Promise<PageParams> }) {
+  return (
+    <ProductErrorBoundary>
+      <ProductDetailContent params={params} />
+    </ProductErrorBoundary>
   );
 } 

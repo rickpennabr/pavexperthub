@@ -12,6 +12,7 @@ import { ColorImages } from './ColorImages';
 import { ProjectImages } from './ProjectImages';
 import { getPlaceholderType, generatePlaceholders } from './utils';
 import BrandsCardLogo from '../BrandsCardLogo';
+import { getBrandColor } from '@/utils/brandColors';
 
 // Component props interface
 interface ProductDetailImageSectionProps {
@@ -105,13 +106,16 @@ const ProductDetailImageSection: React.FC<ProductDetailImageSectionProps> = ({
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [lightboxOpen, handleLightboxNav]);
 
+  // Get brand color
+  const brandColor = getBrandColor(brand);
+
   return (
     <div className="relative w-full h-full">
       {/* Mobile Top Bar: Product Name, Brand Name, Brand Logo */}
       <div className="md:hidden w-full flex items-center justify-between px-3 pt-3 pb-2 bg-white border-b border-gray-200">
         <div className="flex flex-col min-w-0 text-left">
           <span className="font-bold text-base text-black truncate">{productName}</span>
-          <span className="text-xs text-gray-500 truncate">{brand}</span>
+          <span className="text-xs truncate" style={{ color: brandColor }}>{brand}</span>
         </div>
         <div className="flex-shrink-0 ml-3">
           <div className="w-8 h-8 flex items-center justify-center">

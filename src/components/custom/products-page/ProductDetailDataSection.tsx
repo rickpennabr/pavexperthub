@@ -6,7 +6,7 @@
 
 import React, { useState } from 'react';
 import BrandLogo from './BrandsCardLogo';
-import { ChevronDown } from 'lucide-react';
+import { getBrandColor } from '@/utils/brandColors';
 
 // Component props interface
 interface ProductDetailDataSectionProps {
@@ -16,7 +16,7 @@ interface ProductDetailDataSectionProps {
   color: string;
   size: string;
   thickness: string;
-  thickness_in: number;
+  thickness_in: string;
   sqft_pallet: number;
   sqft_layer: number;
   lnft_pallet: number;
@@ -25,6 +25,54 @@ interface ProductDetailDataSectionProps {
   product_note: string;
   colors_available: string[];
   thicknesses_available: string[];
+}
+
+// Animated icon for accordion
+function AccordionIcon({ open }: { open: boolean }) {
+  return (
+    <span className="relative w-5 h-5 flex items-center justify-center">
+      <span
+        className={`absolute left-0 right-0 h-0.5 bg-white rounded transition-all duration-200 ${open ? 'rotate-45 top-2.5' : 'top-1.5'}`}
+        style={{ transitionProperty: 'all' }}
+      />
+      <span
+        className={`absolute left-0 right-0 h-0.5 bg-white rounded transition-all duration-200 ${open ? '-rotate-45 top-2.5' : 'top-3.5'}`}
+        style={{ transitionProperty: 'all' }}
+      />
+    </span>
+  );
+}
+
+// Accordion section component
+function AccordionSection({
+  title,
+  open,
+  onClick,
+  children
+}: {
+  title: string;
+  open: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="w-full">
+      <button
+        className={`w-full flex items-center justify-between px-3 py-2 md:px-4 md:py-2 bg-black text-white font-medium md:text-base h-12 transition-all duration-200 ${open ? 'rounded-t-lg' : 'rounded-lg'} cursor-pointer`}
+        onClick={onClick}
+        style={{ borderRadius: open ? '0.75rem 0.75rem 0 0' : '0.75rem' }}
+      >
+        <span>{title}</span>
+        <AccordionIcon open={open} />
+      </button>
+      <div
+        className={`overflow-hidden transition-all duration-300 bg-white ${open ? 'rounded-b-lg border border-t-0 border-gray-200' : ''}`}
+        style={{ maxHeight: open ? 1000 : 0, borderRadius: open ? '0 0 0.75rem 0.75rem' : '' }}
+      >
+        {open && <div className="p-2 md:p-3">{children}</div>}
+      </div>
+    </div>
+  );
 }
 
 const ProductDetailDataSection: React.FC<ProductDetailDataSectionProps> = ({
@@ -45,9 +93,10 @@ const ProductDetailDataSection: React.FC<ProductDetailDataSectionProps> = ({
   thicknesses_available,
 }) => {
   // State for collapsible sections
-  const [isSpecsOpen, setIsSpecsOpen] = useState(true);
-  const [isDescriptionOpen, setIsDescriptionOpen] = useState(false);
-  const [isResourcesOpen, setIsResourcesOpen] = useState(false);
+  const [openSection, setOpenSection] = useState<'data' | 'desc' | 'resources' | null>('data');
+
+  // Get brand color
+  const brandColor = getBrandColor(brand);
 
   // Define pairs for 4-column rows in the specifications table
   const pairs = [
@@ -84,92 +133,59 @@ const ProductDetailDataSection: React.FC<ProductDetailDataSectionProps> = ({
       <div className="hidden md:flex justify-between items-center p-3 md:p-5 pb-2 md:pb-3">
         <div className="flex flex-col justify-center flex-1 min-w-0 mr-3">
           <h2 className="text-xl md:text-2xl font-bold text-black leading-tight truncate">{product_name}</h2>
-          <span className="hidden md:block text-base font-semibold text-gray-700 mt-0.5 truncate">{brand}</span>
+          <span className="hidden md:block text-base font-semibold mt-0.5 truncate" style={{ color: brandColor }}>{brand}</span>
         </div>
         <div className="flex-shrink-0">
           <BrandLogo brand={brand} size="lg" />
         </div>
       </div>
-      
+
       {/* Product data collapsible section with scrolling */}
       <div className="flex-1 overflow-y-auto px-2 ">
         <div className="space-y-2">
           {/* Product Data Section */}
-          <div>
-            <button 
-              className="mx-auto w-full flex items-center justify-between px-3 py-1   bg-black text-white font-medium md:text-base"
-              onClick={() => setIsSpecsOpen(!isSpecsOpen)}
-            >
-              <span>Product Data</span>
-              <ChevronDown 
-                className={`w-3.5 h-3.5 md:w-4 md:h-4 transition-transform ${isSpecsOpen ? 'rotate-180' : ''}`} 
-              />
-            </button>
-            
-            {/* Specifications table */}
-            {isSpecsOpen && (
-              <div className="p-3 md:p-4 border border-t-0 border-gray-200 mx-auto md:w-full">
-                <table className="w-full border-collapse">
-                  <tbody>
-                    {pairs.map((pair, index) => (
-                      <tr key={index} className="border-b border-gray-200 last:border-b-0">
-                        {pair.map((item, itemIndex) => (
-                          <React.Fragment key={itemIndex}>
-                            <td className="py-1.5 pr-4 font-medium text-red-600 text-xs md:text-sm">
-                              {item.label}
-                            </td>
-                            <td className="py-1.5 text-gray-900 text-xs md:text-sm">
-                              {item.value}
-                            </td>
-                          </React.Fragment>
-                        ))}
-                      </tr>
+          <AccordionSection
+            title="Product Data"
+            open={openSection === 'data'}
+            onClick={() => setOpenSection(openSection === 'data' ? null : 'data')}
+          >
+            <table className="w-full border-collapse">
+              <tbody>
+                {pairs.map((pair, index) => (
+                  <tr key={index} className="border-b border-gray-200 last:border-b-0">
+                    {pair.map((item, itemIndex) => (
+                      <React.Fragment key={itemIndex}>
+                        <td className="py-1.5 pr-4 font-medium text-red-600 text-xs md:text-sm">
+                          {item.label}
+                        </td>
+                        <td className="py-1.5 text-gray-900 text-xs md:text-sm">
+                          {item.value}
+                        </td>
+                      </React.Fragment>
                     ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </div>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </AccordionSection>
 
           {/* Description Section */}
-          <div>
-            <button 
-              className="w-full flex items-center justify-between px-3 py-1 md:px-4 md:py-2 bg-black text-white font-medium md:text-base"
-              onClick={() => setIsDescriptionOpen(!isDescriptionOpen)}
-            >
-              <span>Description</span>
-              <ChevronDown 
-                className={`w-3.5 h-3.5 md:w-4 md:h-4 transition-transform ${isDescriptionOpen ? 'rotate-180' : ''}`} 
-              />
-            </button>
-            
-            {/* Description content */}
-            {isDescriptionOpen && (
-              <div className="p-3 md:p-4 border border-t-0 border-gray-200 mx-auto md:w-full">
-                <p className="text-xs md:text-sm text-gray-700 leading-relaxed">{product_note}</p>
-              </div>
-            )}
-          </div>
+          <AccordionSection
+            title="Description"
+            open={openSection === 'desc'}
+            onClick={() => setOpenSection(openSection === 'desc' ? null : 'desc')}
+          >
+            <p className="text-xs md:text-sm text-gray-700 leading-relaxed">{product_note}</p>
+          </AccordionSection>
 
           {/* Resources Section */}
-          <div>
-            <button 
-              className="w-full flex items-center justify-between px-3 py-1  md:py-2 bg-black text-white font-medium md:text-base"
-              onClick={() => setIsResourcesOpen(!isResourcesOpen)}
-            >
-              <span>Resources</span>
-              <ChevronDown 
-                className={`w-3.5 h-3.5 md:w-4 md:h-4 transition-transform ${isResourcesOpen ? 'rotate-180' : ''}`} 
-              />
-            </button>
-            
-            {/* Resources content */}
-            {isResourcesOpen && (
-              <div className="p-3 md:p-4 border border-t-0 border-gray-200 mx-auto md:w-full">
-                <p className="text-xs md:text-sm text-gray-700 leading-relaxed">Downloadable resources coming soon...</p>
-              </div>
-            )}
-          </div>
+          <AccordionSection
+            title="Resources"
+            open={openSection === 'resources'}
+            onClick={() => setOpenSection(openSection === 'resources' ? null : 'resources')}
+          >
+            <p className="text-xs md:text-sm text-gray-700 leading-relaxed">Downloadable resources coming soon...</p>
+          </AccordionSection>
         </div>
       </div>
     </div>
