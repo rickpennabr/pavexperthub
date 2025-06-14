@@ -1,12 +1,12 @@
 // ============================================================================
-// ProductPlaceholder Component
-// Renders a placeholder SVG for products without images
+// ProductPlaceholder Component (Refactored)
+// Renders a placeholder for products without images
 // Features: Customizable dimensions, colors, and text display
 // ============================================================================
 
 import React from 'react';
+import Image from 'next/image';
 
-// Component props interface
 interface ProductPlaceholderProps {
   text?: string;
   width?: number;
@@ -17,95 +17,45 @@ interface ProductPlaceholderProps {
 }
 
 const ProductPlaceholder: React.FC<ProductPlaceholderProps> = ({
-  text,
+  text = 'Image Coming Soon...',
   width = 150,
   height = 150,
   backgroundColor = '#f3f4f6',
   textColor = '#111827',
   isListMode = false
 }) => {
-  // Use provided text or default to "Image Coming Soon..."
-  const displayText = text || "Image Coming Soon...";
-  
-  // Render text based on display mode
-  const renderText = () => {
-    if (!isListMode) {
-      // Single line text for grid mode
-      return (
-        <text
-          x="50%"
-          y="50%"
-          dominantBaseline="middle"
-          textAnchor="middle"
-          fill={textColor}
-          fontFamily="Arial, sans-serif"
-          fontSize={Math.max(12, Math.floor(width / 12))}
-          fontWeight="bold"
-        >
-          {displayText}
-        </text>
-      );
-    } else {
-      // Multi-line text for list mode
-      const words = displayText.split(' ');
-      const fontSize = Math.max(10, Math.floor(width / 16));
-      
-      return (
-        <>
-          <text
-            x="50%"
-            y="30%"
-            dominantBaseline="middle"
-            textAnchor="middle"
-            fill={textColor}
-            fontFamily="Arial, sans-serif"
-            fontSize={fontSize}
-            fontWeight="bold"
-          >
-            {words[0]}
-          </text>
-          <text
-            x="50%"
-            y="50%"
-            dominantBaseline="middle"
-            textAnchor="middle"
-            fill={textColor}
-            fontFamily="Arial, sans-serif"
-            fontSize={fontSize}
-            fontWeight="bold"
-          >
-            {words[1]}
-          </text>
-          <text
-            x="50%"
-            y="70%"
-            dominantBaseline="middle"
-            textAnchor="middle"
-            fill={textColor}
-            fontFamily="Arial, sans-serif"
-            fontSize={fontSize}
-            fontWeight="bold"
-          >
-            {words[2]}
-          </text>
-        </>
-      );
-    }
-  };
-  
+  const words = text.split(' ');
+
+  // Tailwind classes for font size and spacing
+  const fontClass = isListMode
+    ? 'text-[8px] md:text-[10px] lg:text-xs'
+    : 'text-xs md:text-sm lg:text-base';
+  const spacingClass = isListMode
+    ? 'space-y-2 md:space-y-3'
+    : 'space-y-1';
+
   return (
-    <svg 
-      width={width} 
-      height={height} 
-      viewBox={`0 0 ${width} ${height}`}
-      xmlns="http://www.w3.org/2000/svg"
-      style={{ maxWidth: '100%', height: 'auto' }}
+    <div 
+      className={`flex flex-col items-center justify-center rounded-lg select-none ${spacingClass}`}
+      style={{ width, height, background: backgroundColor }}
     >
-      {/* Background rectangle */}
-      <rect width={width} height={height} fill={backgroundColor} />
-      {/* Text content */}
-      {renderText()}
-    </svg>
+      <div className="mb-1 flex-shrink-0">
+        <Image 
+          src="/images/logo/pavexpert-logo-simble-sq-grey.png" 
+          alt="PavExpert Logo" 
+          width={32}
+          height={32}
+          className="object-contain"
+        />
+      </div>
+      <div className={`flex flex-col items-center text-center font-bold ${fontClass}`} style={{ color: textColor }}>
+        {isListMode ? (
+          words.map((word, i) => <span key={i}>{word}</span>)
+        ) : (
+          <span>{text}</span>
+        )}
+      </div>
+    </div>
   );
 };
 

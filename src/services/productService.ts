@@ -1,0 +1,128 @@
+// ============================================================================
+// Product Service
+// Handles all product-related API calls and data transformations
+// ============================================================================
+
+// Dependencies
+import { createClient } from '@supabase/supabase-js';
+
+// Initialize Supabase client
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+if (!supabaseUrl || !supabaseKey) {
+  throw new Error('Missing Supabase environment variables');
+}
+
+const supabase = createClient(supabaseUrl, supabaseKey);
+
+// Types
+export interface ProductWithDetails {
+  base_product_id: number;
+  product_name: string;
+  product_type: string;
+  product_note: string;
+  created_at: string;
+  updated_at: string;
+  brand?: {
+    brand_name: string;
+  };
+  variants?: Array<{
+    color?: {
+      color_name: string;
+    };
+    size?: string;
+    thickness?: {
+      thickness_mm: string;
+      thickness_in: string;
+    };
+    sqft_pallet?: number;
+    sqft_layer?: number;
+    lnft_pallet?: number;
+    layer_pallet?: number;
+    pcs_pallet?: number;
+    images?: Array<{
+      image_path: string;
+    }>;
+  }>;
+}
+
+interface ServiceResponse<T> {
+  data: T | null;
+  error: string | null;
+}
+
+// Get all products with their details
+export async function getProducts(): Promise<ServiceResponse<ProductWithDetails[]>> {
+  try {
+  const { data, error } = await supabase
+    .from('base_products')
+    .select(`
+      *,
+        brand:brands(brand_name),
+      variants:product_variants(
+          color:colors(color_name),
+          size,
+          thickness:thicknesses(thickness_mm, thickness_in),
+          sqft_pallet,
+          sqft_layer,
+          lnft_pallet,
+          layer_pallet,
+          pcs_pallet,
+          images:product_images(image_path)
+      )
+    `)
+      .order('product_name');
+
+  if (error) {
+      console.error('Error fetching products:', error);
+      return { data: null, error: error.message };
+    }
+
+    return { data: data as ProductWithDetails[], error: null };
+  } catch (error) {
+    console.error('Error in getProducts:', error);
+    return { 
+      data: null, 
+      error: error instanceof Error ? error.message : 'An unexpected error occurred' 
+    };
+  }
+}
+
+// Get a single product by ID
+export async function getProductById(id: string): Promise<ServiceResponse<ProductWithDetails>> {
+  try {
+  const { data, error } = await supabase
+    .from('base_products')
+    .select(`
+      *,
+        brand:brands(brand_name),
+      variants:product_variants(
+          color:colors(color_name),
+          size,
+          thickness:thicknesses(thickness_mm, thickness_in),
+          sqft_pallet,
+          sqft_layer,
+          lnft_pallet,
+          layer_pallet,
+          pcs_pallet,
+          images:product_images(image_path)
+      )
+    `)
+      .eq('base_product_id', id)
+      .single();
+
+  if (error) {
+      console.error('Error fetching product:', error);
+      return { data: null, error: error.message };
+  }
+
+    return { data: data as ProductWithDetails, error: null };
+  } catch (error) {
+    console.error('Error in getProductById:', error);
+    return { 
+      data: null, 
+      error: error instanceof Error ? error.message : 'An unexpected error occurred' 
+    };
+  }
+} 

@@ -33,10 +33,16 @@ export function isRealImagePath(src: string) {
  * @returns properly formatted path for Next.js Image component
  */
 export function getImagePath(src: string) {
-  if (src.startsWith('/')) {
-    return src; // Path is already correct for Next.js Image component
+  // If it's already a full URL (starts with http:// or https://), return as is
+  if (src.startsWith('http://') || src.startsWith('https://')) {
+    return src;
   }
-  return `/${src}`; // Add leading slash if missing
+  // If it starts with a slash, return as is
+  if (src.startsWith('/')) {
+    return src;
+  }
+  // Otherwise, add leading slash
+  return `/${src}`;
 }
 
 /**
