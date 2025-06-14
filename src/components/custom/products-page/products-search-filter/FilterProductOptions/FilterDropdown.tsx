@@ -25,6 +25,7 @@ import "./styles.css";
  * @param onSelect - Callback when an option is selected
  * @param onClear - Callback for clearing the selection
  * @param options - Array of available options to display
+ * @param isLoading - Indicates whether the dropdown is in a loading state
  */
 interface FilterDropdownProps {
   label: string;
@@ -34,6 +35,7 @@ interface FilterDropdownProps {
   onSelect: (value: string) => void;
   onClear: () => void;
   options: string[];
+  isLoading?: boolean;
 }
 
 export default function FilterDropdown({
@@ -44,6 +46,7 @@ export default function FilterDropdown({
   onSelect,
   onClear,
   options,
+  isLoading = false
 }: FilterDropdownProps) {
   const buttonRef = useRef<HTMLButtonElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -128,19 +131,39 @@ export default function FilterDropdown({
               role="menu" 
               aria-orientation="vertical"
             >
-              {options.map((option) => (
-                <button
-                  key={option}
-                  type="button"
-                  className={`block w-full text-left px-2 sm:px-3 md:px-4 py-1 sm:py-1.5 md:py-2 text-[11px] sm:text-xs md:text-sm text-gray-700 hover:bg-red-50 hover:border-l-4 hover:border-red-500 hover:font-bold transition-all ${
-                    option.length > 10 ? "text-[10px] sm:text-[10px] md:text-[11px]" : ""
-                  } cursor-pointer touch-manipulation ${selectedValue === option ? "!bg-black !text-white font-bold" : ""}`}
-                  role="menuitem"
-                  onClick={(e) => handleOptionClick(option, e)}
-                >
-                  {option}
-                </button>
-              ))}
+              {isLoading ? (
+                <div className="p-2 text-center text-gray-500">Loading...</div>
+              ) : (
+                <>
+                  {options.length > 0 ? (
+                    <div className="max-h-60 overflow-y-auto">
+                      {options.map((option) => (
+                        <button
+                          key={option}
+                          type="button"
+                          className={`block w-full text-left px-2 sm:px-3 md:px-4 py-1 sm:py-1.5 md:py-2 text-[11px] sm:text-xs md:text-sm text-gray-700 hover:bg-red-50 hover:border-l-4 hover:border-red-500 hover:font-bold transition-all ${
+                            option.length > 10 ? "text-[10px] sm:text-[10px] md:text-[11px]" : ""
+                          } cursor-pointer touch-manipulation ${selectedValue === option ? "!bg-black !text-white font-bold" : ""}`}
+                          role="menuitem"
+                          onClick={(e) => handleOptionClick(option, e)}
+                        >
+                          {option}
+                        </button>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="p-2 text-center text-gray-500">No options available</div>
+                  )}
+                  {selectedValue && (
+                    <button
+                      onClick={onClear}
+                      className="w-full px-3 py-2 text-sm text-red-600 border-t border-gray-200 hover:bg-red-50"
+                    >
+                      Clear selection
+                    </button>
+                  )}
+                </>
+              )}
             </div>
           </div>
         </div>

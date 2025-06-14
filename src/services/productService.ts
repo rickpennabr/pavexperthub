@@ -125,4 +125,53 @@ export async function getProductById(id: string): Promise<ServiceResponse<Produc
       error: error instanceof Error ? error.message : 'An unexpected error occurred' 
     };
   }
+}
+
+// Get all unique product types
+export async function getProductTypes(): Promise<ServiceResponse<string[]>> {
+  try {
+    const { data, error } = await supabase
+      .from('base_products')
+      .select('product_type')
+      .not('product_type', 'is', null)
+      .order('product_type');
+
+    if (error) {
+      console.error('Error fetching product types:', error);
+      return { data: null, error: error.message };
+    }
+
+    // Get unique product types and filter out null/undefined
+    const uniqueTypes = Array.from(new Set(data.map(item => item.product_type).filter(Boolean)));
+    return { data: uniqueTypes, error: null };
+  } catch (error) {
+    console.error('Error in getProductTypes:', error);
+    return { 
+      data: null, 
+      error: error instanceof Error ? error.message : 'An unexpected error occurred' 
+    };
+  }
+}
+
+// Get all brands
+export async function getBrands(): Promise<ServiceResponse<{ brand_id: number; brand_name: string }[]>> {
+  try {
+    const { data, error } = await supabase
+      .from('brands')
+      .select('brand_id, brand_name')
+      .order('brand_name');
+
+    if (error) {
+      console.error('Error fetching brands:', error);
+      return { data: null, error: error.message };
+    }
+
+    return { data, error: null };
+  } catch (error) {
+    console.error('Error in getBrands:', error);
+    return { 
+      data: null, 
+      error: error instanceof Error ? error.message : 'An unexpected error occurred' 
+    };
+  }
 } 

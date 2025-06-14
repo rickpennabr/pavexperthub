@@ -29,19 +29,56 @@ import React, { useState, useEffect, useRef } from "react";
 import FilterDropdown from "./FilterDropdown";
 import { useFilters } from "@/context/filter-context";
 import { useFilterOptions } from "@/hooks/useFilterOptions";
+import { getBrands, getProductTypes } from '@/services/productService';
+
+interface FilterState {
+  brand: string;
+  type: string;
+  thickness: string;
+  color: string;
+}
 
 export default function FilterProductOptions() {
   // Get filter state and setter from context
   const { filters, setFilters } = useFilters();
   
   // Get filter options from Supabase
-  const { brands, types, thicknesses, colors, loading } = useFilterOptions();
+  const { brands: supabaseBrands, types: supabaseTypes, thicknesses, colors, loading } = useFilterOptions();
   
   // State for managing which dropdown is currently open
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   
   // Ref for handling click outside events
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const [brands, setBrands] = useState<string[]>([]);
+  const [types, setTypes] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchFilterOptions = async () => {
+      try {
+        setIsLoading(true);
+        const [brandsResponse, typesResponse] = await Promise.all([
+          getBrands(),
+          getProductTypes()
+        ]);
+
+        if (brandsResponse.data) {
+          setBrands(brandsResponse.data.map(brand => brand.brand_name));
+        }
+        if (typesResponse.data) {
+          setTypes(typesResponse.data);
+        }
+      } catch (error) {
+        console.error('Error fetching filter options:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchFilterOptions();
+  }, []);
 
   // Handle click outside and escape key events
   useEffect(() => {
@@ -89,6 +126,7 @@ export default function FilterProductOptions() {
             setOpenDropdown(null);
           }}
           options={brands}
+          isLoading={isLoading}
         />
       </div>
 
@@ -108,6 +146,7 @@ export default function FilterProductOptions() {
             setOpenDropdown(null);
           }}
           options={types}
+          isLoading={isLoading}
         />
       </div>
 
