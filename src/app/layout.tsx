@@ -2,6 +2,9 @@ import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import ClientLayout from "@/components/layout/ClientLayout";
+import { JsonLd } from "@/components/seo/json-ld";
+import { buildBusinessJsonLd } from "@/lib/seo/json-ld";
+import { SITE_URL } from "@/lib/seo/site";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -11,8 +14,18 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: 'PavExpert Hub',
-  description: 'Your trusted source for paving expertise',
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: "Paver Installer in Las Vegas | PavExpert Hub",
+    template: "%s | PavExpert Hub",
+  },
+  description:
+    "Paver installer in Las Vegas, Henderson, and Summerlin. Travertine and porcelain installation, paver repair, paver step repair, sealing, and landscape projects.",
+  openGraph: {
+    siteName: "PavExpert Hub",
+    type: "website",
+    locale: "en_US",
+  },
 };
 
 export default function RootLayout({
@@ -29,6 +42,7 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-status-bar-style" content="black" />
       </head>
       <body className={inter.className}>
+        <JsonLd data={buildBusinessJsonLd()} />
         <ClientLayout>
           <main>
           {children}

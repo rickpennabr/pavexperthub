@@ -1,6 +1,6 @@
 'use client';
 
-import { Package, Wrench, Truck, FileText, Video } from "lucide-react";
+import { HardHat, Package, Truck, FileText, Video } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -29,8 +29,7 @@ export default function MainMenu() {
     if (path.startsWith("/expert-blog/")) return "expert-blog";
     if (path.startsWith("/videos/")) return "videos";
     
-    // Default to products for root path
-    if (path === "/") return "products";
+    if (path === "/") return "services";
     
     return null;
   };
@@ -38,8 +37,8 @@ export default function MainMenu() {
   const activeItem = getActiveItem(pathname);
 
   const menuItems = [
+    { name: "SERVICES", icon: <HardHat className="w-4 h-4 sm:w-5 sm:h-5" />, id: "services", href: "/services" },
     { name: "PRODUCTS", icon: <Package className="w-4 h-4 sm:w-5 sm:h-5" />, id: "products", href: "/products" },
-    { name: "SERVICES", icon: <Wrench className="w-4 h-4 sm:w-5 sm:h-5" />, id: "services", href: "/services" },
     { name: "SUPPLIERS", icon: <Truck className="w-4 h-4 sm:w-5 sm:h-5" />, id: "suppliers", href: "/suppliers" },
     { name: "EXPERTBLOG", icon: <FileText className="w-4 h-4 sm:w-5 sm:h-5" />, id: "expert-blog", href: "/expert-blog" },
     { name: "VIDEOS", icon: <Video className="w-4 h-4 sm:w-5 sm:h-5" />, id: "videos", href: "/videos" },

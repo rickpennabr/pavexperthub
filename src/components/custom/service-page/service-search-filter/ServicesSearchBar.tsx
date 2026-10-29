@@ -7,16 +7,17 @@
 
 "use client"
 
-import React, { useState, useRef } from "react";
+import React, { useRef } from "react";
 import { Search } from "lucide-react";
 import SearchBarCleaner from "@/components/common/SearchBarCleaner";
+import { useFilters } from "@/context/filter-context";
 
 interface ServicesSearchBarProps {
   onFocus?: () => void;
 }
 
 export default function ServicesSearchBar({ onFocus }: ServicesSearchBarProps) {
-  const [searchText, setSearchText] = useState("");
+  const { searchText, setSearchText } = useFilters();
   const inputRef = useRef<HTMLInputElement>(null);
 
   const handleClear = () => {

@@ -5,6 +5,7 @@ export interface Service {
   price: string;
   link: string;
   details: string;
+  image_url?: string;
   created_at?: string;
   updated_at?: string;
 } 

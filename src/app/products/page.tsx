@@ -1,19 +1,19 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import ProductGridItem from '@/components/layout/ProductGridItem';
 import { getProducts } from '@/services/productService';
 import Pagination from '@/components/custom/products-page/Pagination';
 import { ProductWithDetails } from '@/services/productService';
 import { useFilters } from '@/context/filter-context';
+import { variantMatchesFilters } from '@/lib/product-filters';
 
 export default function ProductsPage() {
   const [products, setProducts] = useState<ProductWithDetails[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const { viewMode, searchText } = useFilters();
+  const { viewMode, searchText, filters } = useFilters();
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -25,7 +25,6 @@ export default function ProductsPage() {
         }
         if (result.data) {
           setProducts(result.data);
-          setTotalPages(Math.ceil(result.data.length / 18));
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to fetch products');
@@ -42,24 +41,41 @@ export default function ProductsPage() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Filter products by searchText before pagination
-  const filteredProducts = products.filter((product) => {
-    const name = product.product_name?.toLowerCase() || '';
-    const brand = product.brand?.brand_name?.toLowerCase() || '';
-    const variant = product.variants?.[0];
-    const color = variant?.color?.color_name?.toLowerCase() || '';
-    const size = variant?.size?.toLowerCase() || '';
-    const search = searchText?.toLowerCase() || '';
-    return (
-      name.includes(search) ||
-      brand.includes(search) ||
-      color.includes(search) ||
-      size.includes(search)
-    );
-  });
+  const filteredProducts = useMemo(() => {
+    const search = searchText.trim().toLowerCase();
+    return products.filter((product) => {
+      if (filters.brand && (product.brand?.brand_name || '').toLowerCase() !== filters.brand.toLowerCase()) {
+        return false;
+      }
+      if (filters.type && (product.product_type || '').toLowerCase() !== filters.type.toLowerCase()) {
+        return false;
+      }
+      if (
+        (filters.color || filters.thickness) &&
+        !(product.variants || []).some((variant) => variantMatchesFilters(variant, filters))
+      ) {
+        return false;
+      }
+      if (!search) return true;
+      const variantText = (product.variants || [])
+        .map((variant) =>
+          [variant.color?.color_name, variant.size, variant.thickness?.thickness_mm, variant.thickness?.thickness_in]
+            .filter(Boolean)
+            .join(' '),
+        )
+        .join(' ')
+        .toLowerCase();
+      return [product.product_name, product.brand?.brand_name, product.product_type, variantText]
+        .join(' ')
+        .toLowerCase()
+        .includes(search);
+    });
+  }, [products, searchText, filters]);
 
   const itemsPerPage = 18;
-  const startIndex = (currentPage - 1) * itemsPerPage;
+  const pageCount = Math.max(1, Math.ceil(filteredProducts.length / itemsPerPage));
+  const safePage = Math.min(currentPage, pageCount);
+  const startIndex = (safePage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const currentProducts = filteredProducts.slice(startIndex, endIndex);
 
@@ -91,22 +107,28 @@ export default function ProductsPage() {
       <div className="w-full">
         {/* Products Grid/List */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-          {currentProducts.map((product) => (
-            <ProductGridItem
-              key={product.base_product_id}
-              product={product}
-              supabaseProduct={product}
-              viewMode={viewMode}
-            />
-          ))}
+          {currentProducts.length === 0 ? (
+            <div className="col-span-full py-12 text-center text-lg text-gray-400">
+              No products match these filters.
+            </div>
+          ) : (
+            currentProducts.map((product) => (
+              <ProductGridItem
+                key={product.base_product_id}
+                product={product}
+                supabaseProduct={product}
+                viewMode={viewMode}
+              />
+            ))
+          )}
         </div>
 
         {/* Pagination */}
-        {totalPages > 1 && (
+        {filteredProducts.length > itemsPerPage && (
           <div className="mt-8">
             <Pagination
-              currentPage={currentPage}
-              totalPages={Math.ceil(filteredProducts.length / itemsPerPage)}
+              currentPage={safePage}
+              totalPages={pageCount}
               onPageChange={handlePageChange}
             />
           </div>
@@ -114,7 +136,9 @@ export default function ProductsPage() {
 
         {/* Total Products Count */}
         <div className="text-center text-gray-600 mt-4">
-          Showing {startIndex + 1}-{Math.min(endIndex, filteredProducts.length)} of {filteredProducts.length} products
+          {filteredProducts.length === 0
+            ? 'Showing 0 products'
+            : `Showing ${startIndex + 1}-${Math.min(endIndex, filteredProducts.length)} of ${filteredProducts.length} products`}
         </div>
       </div>
     </div>

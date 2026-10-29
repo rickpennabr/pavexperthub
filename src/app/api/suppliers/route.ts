@@ -35,7 +35,7 @@ export async function GET() {
           )
         )
       `)
-      .order('cross_street')
+      .order('cross_street', { ascending: true, nullsFirst: false })
 
     if (error) {
       console.error('Error fetching branches:', error)

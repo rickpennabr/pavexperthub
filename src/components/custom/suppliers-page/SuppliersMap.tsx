@@ -31,16 +31,19 @@ const useIsDesktop = () => {
 };
 
 // Custom marker component
-const CustomMarker = ({ branch, onClick, isSelected }: { 
+const CustomMarker = ({ branch, onClick, isSelected, onHover }: { 
   branch: TransformedBranch; 
   onClick: () => void;
   isSelected: boolean;
+  onHover: (hovered: boolean) => void;
 }) => {
   const logoUrl = branch.supplier.brand_logos?.[0]?.logo_url;
   
   return (
     <div 
       onClick={onClick}
+      onMouseEnter={() => onHover(true)}
+      onMouseLeave={() => onHover(false)}
       className={`
         relative w-6 h-6 md:w-8 md:h-8 cursor-pointer transform rotate-45 
         ${isSelected ? 'scale-110' : 'hover:scale-110'} 
@@ -85,6 +88,7 @@ export function SuppliersMap({
   onMarkerClick,
 }: SuppliersMapProps) {
   const [infoWindowOpen, setInfoWindowOpen] = useState(false);
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
   const isDesktop = useIsDesktop();
 
   // Handle escape key press
@@ -132,7 +136,7 @@ export function SuppliersMap({
   };
 
   return (
-    <div className="w-full h-full -mt-2 md:mt-0" style={{ minHeight: "500px" }}>
+    <div className="h-full max-h-screen w-full">
       <APIProvider 
         apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!}
         libraries={['marker']}
@@ -154,6 +158,7 @@ export function SuppliersMap({
                   lat: branch.latitude,
                   lng: branch.longitude
                 }}
+                zIndex={hoveredId === branch.id ? 1000 : selectedBranch?.id === branch.id ? 500 : 1}
                 onClick={() => handleMarkerClick(branch)}
                 title={branch.supplier.supplier_name}
               >
@@ -161,6 +166,7 @@ export function SuppliersMap({
                   branch={branch} 
                   onClick={() => handleMarkerClick(branch)}
                   isSelected={selectedBranch?.id === branch.id}
+                  onHover={(hovered) => setHoveredId((current) => hovered ? branch.id : current === branch.id ? null : current)}
                 />
               </AdvancedMarker>
             )

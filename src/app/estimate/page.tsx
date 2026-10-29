@@ -10,6 +10,8 @@ import { User, Mail, Phone, MessageSquare, Image as ImageIcon, ArrowRight, Arrow
 import { useRouter } from 'next/navigation'
 import { FaRocket } from 'react-icons/fa'
 import Image from 'next/image'
+import AddressSuggestInput from '@/components/custom/estimate-page/address-suggest-input'
+import type { AddressSuggestion, ServiceCity } from '@/lib/address-suggest'
 
 // Initialize Supabase client
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
@@ -59,6 +61,11 @@ export default function EstimatePage() {
   })
 
   const referral = watch('referral')
+  const addressValue = watch('address')
+
+  useEffect(() => {
+    register('address')
+  }, [register])
   
   useEffect(() => {
     setShowOtherInput(referral === 'Other')
@@ -293,16 +300,23 @@ export default function EstimatePage() {
     }
   }
 
-  // Handle manual city selection
-  const handleCityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const city = e.target.value
-    setValue('city', city as 'Las Vegas' | 'Henderson' | 'North Las Vegas' | 'Other')
-    
+  const applyCity = (city: ServiceCity) => {
+    setValue('city', city, { shouldValidate: true, shouldDirty: true })
     if (city === 'Other') {
       setError('We currently only service Las Vegas, Henderson, and North Las Vegas areas.')
     } else {
       setError(null)
     }
+  }
+
+  const handleCityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    applyCity(e.target.value as ServiceCity)
+  }
+
+  const handleAddressSelect = (suggestion: AddressSuggestion) => {
+    setValue('address', suggestion.street, { shouldValidate: true, shouldDirty: true })
+    setValue('zip', suggestion.zip, { shouldValidate: true, shouldDirty: true })
+    applyCity(suggestion.city)
   }
 
   if (isPageLoading) {
@@ -493,16 +507,13 @@ export default function EstimatePage() {
                         Street Address *
                       </label>
                     </div>
-                    <div className="relative">
-                      <input
-                        type="text"
-                        id="address"
-                        {...register('address')}
-                        placeholder="Enter your street address"
-                        autoComplete="street-address"
-                        className="mt-1 block w-full rounded-md border-2 border-black shadow-sm focus:border-red-500 focus:ring-red-500 pl-4 pr-4 py-2.5 cursor-pointer focus:bg-black focus:text-white transition-colors duration-200 peer text-[16px]"
-                      />
-                    </div>
+                    <AddressSuggestInput
+                      id="address"
+                      value={addressValue ?? ''}
+                      onChange={(next) => setValue('address', next, { shouldValidate: true, shouldDirty: true })}
+                      onSelect={handleAddressSelect}
+                      className="mt-1 block w-full rounded-md border-2 border-black shadow-sm focus:border-red-500 focus:ring-red-500 pl-4 pr-4 py-2.5 cursor-pointer focus:bg-black focus:text-white transition-colors duration-200 peer text-[16px]"
+                    />
                     {errors.address && (
                       <p className="mt-1 text-sm text-red-600">{errors.address.message}</p>
                     )}

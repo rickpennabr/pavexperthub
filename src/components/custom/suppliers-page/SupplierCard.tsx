@@ -80,11 +80,10 @@ export const SupplierCard: React.FC<SupplierCardProps> = ({
       <div className="flex items-center gap-2 pb-2 pl-2">
         {/* Diamond Logo Container */}
         <div 
-          className="w-8 h-8 flex items-center justify-center bg-white border border-gray-200 flex-shrink-0 rotate-45"
-          style={{ overflow: 'hidden', boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)', marginTop: '-0.3em', marginBottom: '-0.3em' }}
+          className="relative w-8 h-8 flex items-center justify-center overflow-hidden bg-white border border-gray-200 flex-shrink-0 rotate-45 shadow-sm"
           title={supplier.supplier_name}
         >
-          <div className="w-full h-full flex items-center justify-center -rotate-45">
+          <div className="relative h-full w-full -rotate-45">
             {supplier.brand_logos?.[0]?.logo_url ? (
               <Image
                 src={supplier.brand_logos[0].logo_url}
@@ -109,7 +108,9 @@ export const SupplierCard: React.FC<SupplierCardProps> = ({
         {/* Supplier Info */}
         <div className="flex-1 min-w-0">
           <h3 className="text-sm font-bold truncate">{supplier.supplier_name}</h3>
-          <p className="text-xs font-bold text-red-500 mt-0.5 truncate">{crossStreet}</p>
+          {crossStreet.trim() && (
+            <p className="mt-0.5 truncate text-xs font-bold text-red-500">{crossStreet}</p>
+          )}
         </div>
       </div>
 

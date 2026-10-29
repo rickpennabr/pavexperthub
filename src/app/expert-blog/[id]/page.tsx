@@ -1,54 +1,42 @@
-/**
- * Blog Post Page
- * 
- * A page for viewing individual blog posts with rich content.
- */
+'use client'
 
-"use client"
-
-import React from "react";
-import Link from "next/link";
-import { useParams } from "next/navigation";
-import { Calendar, Clock, ArrowLeft } from "lucide-react";
-import AppContainer from "@/components/layout/AppContainer";
-
-// Mock data for blog posts
-const blogPosts = [
-  {
-    id: 1,
-    title: "The Ultimate Guide to Paver Installation",
-    content: `
-      <h2>Introduction</h2>
-      <p>Installing pavers correctly is crucial for creating a durable and beautiful outdoor space. This comprehensive guide will walk you through every step of the process.</p>
-
-      <h2>Site Preparation</h2>
-      <p>The foundation of any successful paver installation begins with proper site preparation. This includes clearing the area, excavating to the proper depth, ensuring proper drainage, and compacting the subgrade.</p>
-
-      <h2>Base Installation</h2>
-      <p>A strong base is essential for preventing settling and maintaining the integrity of your paver installation. We'll cover choosing the right base materials, proper compaction techniques, and establishing the correct slope.</p>
-
-      <h2>Paver Installation</h2>
-      <p>The actual installation process requires precision and attention to detail. Key steps include laying the first course, maintaining consistent joint spacing, cutting and fitting edge pieces, and final compaction.</p>
-
-      <h2>Finishing Touches</h2>
-      <p>Complete your installation with joint sand installation, sealing the surface, and final clean-up and inspection.</p>
-
-      <h2>Let&apos;s walk through the essential steps and best practices for a perfect paver installation that&apos;ll last for years.</h2>
-    `,
-    category: "Installation Tips",
-    created_at: "2024-03-15",
-    read_time: "8 min read",
-    author: {
-      name: "John Smith",
-      role: "Senior Installer"
-    }
-  }
-];
+import React, { useEffect, useState } from 'react'
+import Link from 'next/link'
+import { useParams } from 'next/navigation'
+import { Calendar, Clock, ArrowLeft } from 'lucide-react'
+import AppContainer from '@/components/layout/AppContainer'
+import { fallbackPosts, type PublicArticle } from '@/data/editorial'
+import { getPublishedPost } from '@/services/contentService'
 
 export default function BlogPost() {
-  const params = useParams();
-  const postId = parseInt(params.id as string);
-  const post = blogPosts.find(p => p.id === postId);
+  const params = useParams()
+  const postId = String(params.id ?? '')
+  const [post, setPost] = useState<PublicArticle | null | undefined>(undefined)
+
+  useEffect(() => {
+    let cancelled = false
+    getPublishedPost(postId)
+      .then((found) => {
+        if (cancelled) return
+        setPost(found ?? fallbackPosts.find((item) => item.id === postId) ?? null)
+      })
+      .catch(() => {
+        if (!cancelled) setPost(fallbackPosts.find((item) => item.id === postId) ?? null)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [postId])
+
+  if (post === undefined) {
+    return (
+      <AppContainer>
+        <div className="flex min-h-[240px] items-center justify-center bg-white">
+          <div className="h-8 w-8 animate-spin rotate-45 rounded-sm border-2 border-black bg-red-500" />
+        </div>
+      </AppContainer>
+    )
+  }
 
   if (!post) {
     return (
@@ -67,14 +55,15 @@ export default function BlogPost() {
           </div>
         </div>
       </AppContainer>
-    );
+    )
   }
+
+  const paragraphs = post.body.split(/\n\n+/).map((paragraph) => paragraph.trim()).filter(Boolean)
 
   return (
     <AppContainer>
       <div className="w-full h-full bg-white p-4">
         <div className="max-w-4xl mx-auto">
-          {/* Back button */}
           <Link
             href="/expert-blog"
             className="inline-flex items-center gap-2 text-gray-600 hover:text-red-500 mb-8 transition-colors duration-300"
@@ -83,7 +72,6 @@ export default function BlogPost() {
             Back to Blog
           </Link>
 
-          {/* Article header */}
           <header className="mb-8">
             <div className="flex items-center gap-4 text-sm text-gray-600 mb-4">
               <div className="flex items-center gap-1">
@@ -103,13 +91,20 @@ export default function BlogPost() {
             </div>
           </header>
 
-          {/* Article content */}
-          <article 
-            className="prose prose-lg max-w-none"
-            dangerouslySetInnerHTML={{ __html: post.content }}
-          />
+          {post.html ? (
+            <article
+              className="prose prose-lg max-w-none"
+              dangerouslySetInnerHTML={{ __html: post.html }}
+            />
+          ) : (
+            <article className="space-y-4 text-base leading-7 text-gray-800">
+              {paragraphs.map((paragraph, index) => (
+                <p key={index}>{paragraph}</p>
+              ))}
+            </article>
+          )}
         </div>
       </div>
     </AppContainer>
-  );
-} 
+  )
+}

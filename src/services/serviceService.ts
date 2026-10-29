@@ -17,6 +17,7 @@ export interface Service {
   price: string
   link: string
   details: string
+  image_url?: string
 }
 
 export async function getServices() {

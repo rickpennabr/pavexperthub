@@ -189,9 +189,9 @@ export default function SuppliersPage() {
   };
 
   return (
-    <div className="flex flex-col md:flex-row w-full bg-black md:bg-white h-screen">
+    <div className="flex h-[calc(100dvh-8.25rem)] max-h-screen min-h-0 w-full flex-col gap-2 bg-black md:flex-row md:gap-0 md:bg-white">
       {/* Left: Branch List */}
-      <div className="md:w-[30%] w-full bg-black md:bg-white border-r border-gray-200 flex flex-col">       
+      <div className={`flex w-full flex-col border-r border-gray-200 bg-black md:h-full md:min-h-0 md:w-[30%] md:flex-none md:bg-white ${activeTab === 'map' ? 'shrink-0' : 'min-h-0 flex-1'}`}>       
         {/* Search Container */}
         <div className="bg-white border-b border-black rounded-[10px] py-1 md:py-2 px-2 md:px-1">
           {/* Search Bar and Map Button Container */}
@@ -236,7 +236,7 @@ export default function SuppliersPage() {
         </div>
         
         {/* Branches List - Hidden on mobile when Map tab is selected */}
-        <div className={`flex-1 overflow-y-auto pt-2 md:px-3 ${activeTab === 'map' ? 'hidden md:block' : 'block'}`}>
+        <div className={`min-h-0 flex-1 overflow-y-auto pt-2 md:px-3 ${activeTab === 'map' ? 'hidden md:block' : 'block'}`}>
           {isLoading ? (
             <div className="flex items-center justify-center h-full">
               <div className="text-center">
@@ -272,8 +272,8 @@ export default function SuppliersPage() {
       </div>
       
       {/* Right: Map View - Hidden on mobile when List tab is selected */}
-      <div className={`md:w-[70%] w-full h-full ${activeTab === 'list' ? 'hidden md:block' : 'block'}`}>
-        <div className="w-full h-full relative mt-2 md:mt-0 rounded-lg overflow-hidden map-container" style={{ minHeight: "500px" }}>
+      <div className={`min-h-0 w-full md:block md:h-full md:w-[70%] md:flex-none ${activeTab === 'list' ? 'hidden' : 'flex flex-1 flex-col'}`}>
+        <div className="map-container relative h-full max-h-screen w-full overflow-hidden rounded-lg">
           <SuppliersMap
             branches={mapBranches}
             selectedBranch={selectedBranch}

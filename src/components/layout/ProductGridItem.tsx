@@ -13,6 +13,8 @@ import BrandLogo from '../custom/products-page/product-grid-item/BrandLogo';
 import Image from 'next/image';
 import { supabase } from '@/lib/supabaseClient';
 import { isRealImagePath, getImagePath } from '@/components/custom/products-page/product-detail-image/utils';
+import { useFilters } from '@/context/filter-context';
+import { variantMatchesFilters } from '@/lib/product-filters';
 
 // Component props interface
 interface ProductGridItemProps {
@@ -66,17 +68,20 @@ const ProductGridItem: React.FC<ProductGridItemProps> = ({ product, supabaseProd
   const productName = supabaseProduct?.product_name || (product as Product).product_name || '';
   const productId = (product as ProductWithDetails).base_product_id || (product as Product).product_id || '';
   
-  // Get the first variant for display
-  const firstVariant = supabaseProduct?.variants?.[0];
-  const color = firstVariant?.color?.color_name || (product as Product).color || '';
-  const size = firstVariant?.size || (product as Product).size || '';
-  const thickness_mm = firstVariant?.thickness?.thickness_mm || (product as Product).thickness || '';
-  const thickness_in = firstVariant?.thickness?.thickness_in || '';
-  const sqftPallet = firstVariant?.sqft_pallet || (product as Product).sqft_pallet || 0;
-  const sqftLayer = firstVariant?.sqft_layer || (product as Product).sqft_layer || 0;
+  const { filters } = useFilters();
+  const variants = supabaseProduct?.variants ?? [];
+  const matchedVariant = (filters.color || filters.thickness)
+    ? variants.find((variant) => variantMatchesFilters(variant, filters))
+    : undefined;
+  const displayVariant = matchedVariant ?? variants[0];
+  const color = displayVariant?.color?.color_name || (product as Product).color || '';
+  const size = displayVariant?.size || (product as Product).size || '';
+  const thickness_mm = displayVariant?.thickness?.thickness_mm || (product as Product).thickness || '';
+  const thickness_in = displayVariant?.thickness?.thickness_in || '';
+  const sqftPallet = displayVariant?.sqft_pallet || (product as Product).sqft_pallet || 0;
+  const sqftLayer = displayVariant?.sqft_layer || (product as Product).sqft_layer || 0;
 
-  // Get the first variant's image or use the product's thumbnail
-  const imagePath = (firstVariant?.images?.[0]?.image_path || (product as Product).product_image_thumbnail || '');
+  const imagePath = (displayVariant?.images?.[0]?.image_path || (product as Product).product_image_thumbnail || '');
 
   // Standard color state
   const [standardColor, setStandardColor] = useState<string>("");
@@ -102,7 +107,8 @@ const ProductGridItem: React.FC<ProductGridItemProps> = ({ product, supabaseProd
 
   useEffect(() => {
     const fetchProductData = async () => {
-      if (!productId) return;
+      // The catalog cards already have base_products data. The legacy products table is unused.
+      if (supabaseProduct || !productId) return;
       const { data } = await supabase
         .from('products')
         .select(`
@@ -121,7 +127,9 @@ const ProductGridItem: React.FC<ProductGridItemProps> = ({ product, supabaseProd
       }
     };
     fetchProductData();
-  }, [productId]);
+  }, [productId, supabaseProduct]);
+
+  const shownColor = (filters.color || filters.thickness) ? color : (standardColor || color);
 
   if (!productData && !supabaseProduct) {
     return null;
@@ -195,7 +203,7 @@ const ProductGridItem: React.FC<ProductGridItemProps> = ({ product, supabaseProd
             <tbody>
               <tr className="border-b border-gray-200 last:border-b-0">
                 <td className="font-bold text-red-600 px-0.5 py-0.5 whitespace-nowrap text-left border-r border-gray-200 last:border-r-0 min-w-[70px]" title="Color">Color</td>
-                <td className="text-black px-0.5 py-0.5 truncate text-center border-r border-gray-200 last:border-r-0" title={standardColor || color}>{standardColor || color}</td>
+                <td className="text-black px-0.5 py-0.5 truncate text-center border-r border-gray-200 last:border-r-0" title={shownColor}>{shownColor}</td>
                 <td className="font-bold text-red-600 px-0.5 py-0.5 whitespace-nowrap text-left border-r border-gray-200 last:border-r-0 min-w-[70px]" title="Size">Size</td>
                 <td className="text-black px-0.5 py-0.5 truncate text-center border-r border-gray-200 last:border-r-0" title={size}>{size}</td>
               </tr>

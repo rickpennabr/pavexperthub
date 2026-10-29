@@ -72,10 +72,11 @@ export async function getProducts(): Promise<ServiceResponse<ProductWithDetails[
           images:product_images(image_path)
       )
     `)
-      .order('product_name');
+      .order('product_name')
+      .order('variant_id', { foreignTable: 'variants', ascending: true });
 
   if (error) {
-      console.error('Error fetching products:', error);
+      console.error('Error fetching products:', error.message, error.code, error.details);
       return { data: null, error: error.message };
     }
 
@@ -110,10 +111,11 @@ export async function getProductById(id: string): Promise<ServiceResponse<Produc
       )
     `)
       .eq('base_product_id', id)
+      .order('variant_id', { foreignTable: 'variants', ascending: true })
       .single();
 
   if (error) {
-      console.error('Error fetching product:', error);
+      console.error('Error fetching product:', error.message, error.code, error.details);
       return { data: null, error: error.message };
   }
 

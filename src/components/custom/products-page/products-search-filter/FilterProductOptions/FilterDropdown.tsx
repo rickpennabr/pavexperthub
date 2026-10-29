@@ -22,6 +22,8 @@ import "./styles.css";
  * @param selectedValue - Currently selected option value
  * @param isOpen - Controls the dropdown's open/closed state
  * @param onToggle - Callback for toggling the dropdown
+ * @param onOpen - Opens this dropdown (hover)
+ * @param onClose - Closes this dropdown (hover leave)
  * @param onSelect - Callback when an option is selected
  * @param onClear - Callback for clearing the selection
  * @param options - Array of available options to display
@@ -32,6 +34,8 @@ interface FilterDropdownProps {
   selectedValue: string;
   isOpen: boolean;
   onToggle: () => void;
+  onOpen: () => void;
+  onClose: () => void;
   onSelect: (value: string) => void;
   onClear: () => void;
   options: string[];
@@ -43,6 +47,8 @@ export default function FilterDropdown({
   selectedValue,
   isOpen,
   onToggle,
+  onOpen,
+  onClose,
   onSelect,
   onClear,
   options,
@@ -50,6 +56,31 @@ export default function FilterDropdown({
 }: FilterDropdownProps) {
   const buttonRef = useRef<HTMLButtonElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const clearCloseTimer = () => {
+    if (closeTimer.current) {
+      clearTimeout(closeTimer.current);
+      closeTimer.current = null;
+    }
+  };
+
+  const canHover = () =>
+    window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+
+  const handleMouseEnter = () => {
+    if (!canHover()) return;
+    clearCloseTimer();
+    if (!isOpen) onOpen();
+  };
+
+  const handleMouseLeave = () => {
+    if (!canHover()) return;
+    clearCloseTimer();
+    closeTimer.current = setTimeout(() => onClose(), 150);
+  };
+
+  useEffect(() => clearCloseTimer, []);
 
   // Get short label for mobile
   const shortLabel = label.replace("Pick a ", "");
@@ -63,7 +94,7 @@ export default function FilterDropdown({
         buttonRef.current &&
         !buttonRef.current.contains(event.target as Node)
       ) {
-        onToggle();
+        onClose();
       }
     };
 
@@ -74,7 +105,7 @@ export default function FilterDropdown({
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [isOpen, onToggle]);
+  }, [isOpen, onClose]);
 
   // Update dropdown position
   useEffect(() => {
@@ -83,7 +114,7 @@ export default function FilterDropdown({
       const dropdownElement = dropdownRef.current;
       if (dropdownElement) {
         dropdownElement.style.setProperty('--dropdown-left', `${buttonRect.left}px`);
-        dropdownElement.style.setProperty('--dropdown-top', `${buttonRect.bottom + 1}px`);
+        dropdownElement.style.setProperty('--dropdown-top', `${buttonRect.bottom}px`);
         dropdownElement.style.setProperty('--dropdown-width', `${buttonRect.width}px`);
       }
     }
@@ -96,7 +127,11 @@ export default function FilterDropdown({
   };
 
   return (
-    <div className="relative flex items-center w-full">
+    <div
+      className="relative flex items-center w-full"
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
       <button
         ref={buttonRef}
         type="button"

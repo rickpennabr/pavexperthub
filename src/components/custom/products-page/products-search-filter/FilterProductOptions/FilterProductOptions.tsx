@@ -18,7 +18,7 @@
  *     - FilterDropdown (Child, used for each filter type)
  * 
  * State Management:
- * - Uses individual state for each filter type
+ * - Writes brand, type, thickness, and color into the shared filter context
  * - Manages a single openDropdown state to ensure only one dropdown is open at a time
  * - Handles click outside and escape key events for better UX
  */
@@ -27,15 +27,12 @@
 
 import React, { useEffect, useState, useRef } from 'react';
 import { getBrands, getProductTypes, getThicknesses, getColors } from '@/services/productService';
+import { useFilters } from '@/context/filter-context';
+import { thicknessLabel } from '@/lib/product-filters';
 import FilterDropdown from './FilterDropdown';
 
 export default function FilterProductOptions() {
-  const [filters, setFilters] = useState({
-    brand: '',
-    type: '',
-    thickness: '',
-    color: ''
-  });
+  const { filters, setFilters } = useFilters();
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [brands, setBrands] = useState<string[]>([]);
   const [types, setTypes] = useState<string[]>([]);
@@ -62,7 +59,7 @@ export default function FilterProductOptions() {
           setTypes(typesResponse.data);
         }
         if (thicknessesResponse.data) {
-          setThicknesses(thicknessesResponse.data.map(t => `${t.thickness_mm}mm (${t.thickness_in}")`));
+          setThicknesses(thicknessesResponse.data.map((item) => thicknessLabel(item)));
         }
         if (colorsResponse.data) {
           setColors(colorsResponse.data.map(color => color.color_name));
@@ -109,6 +106,8 @@ export default function FilterProductOptions() {
           selectedValue={filters.brand}
           isOpen={openDropdown === "brand"}
           onToggle={() => setOpenDropdown(openDropdown === "brand" ? null : "brand")}
+          onOpen={() => setOpenDropdown("brand")}
+          onClose={() => setOpenDropdown((current) => (current === "brand" ? null : current))}
           onSelect={(value) => {
             setFilters(prev => ({ ...prev, brand: value }));
             setOpenDropdown(null);
@@ -129,6 +128,8 @@ export default function FilterProductOptions() {
           selectedValue={filters.type}
           isOpen={openDropdown === "type"}
           onToggle={() => setOpenDropdown(openDropdown === "type" ? null : "type")}
+          onOpen={() => setOpenDropdown("type")}
+          onClose={() => setOpenDropdown((current) => (current === "type" ? null : current))}
           onSelect={(value) => {
             setFilters(prev => ({ ...prev, type: value }));
             setOpenDropdown(null);
@@ -149,6 +150,8 @@ export default function FilterProductOptions() {
           selectedValue={filters.thickness}
           isOpen={openDropdown === "thickness"}
           onToggle={() => setOpenDropdown(openDropdown === "thickness" ? null : "thickness")}
+          onOpen={() => setOpenDropdown("thickness")}
+          onClose={() => setOpenDropdown((current) => (current === "thickness" ? null : current))}
           onSelect={(value) => {
             setFilters(prev => ({ ...prev, thickness: value }));
             setOpenDropdown(null);
@@ -169,6 +172,8 @@ export default function FilterProductOptions() {
           selectedValue={filters.color}
           isOpen={openDropdown === "color"}
           onToggle={() => setOpenDropdown(openDropdown === "color" ? null : "color")}
+          onOpen={() => setOpenDropdown("color")}
+          onClose={() => setOpenDropdown((current) => (current === "color" ? null : current))}
           onSelect={(value) => {
             setFilters(prev => ({ ...prev, color: value }));
             setOpenDropdown(null);
