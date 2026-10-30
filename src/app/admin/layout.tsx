@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { AdminSetup } from '@/components/admin/admin-login'
 import { AdminShell } from '@/components/admin/admin-shell'
@@ -32,9 +33,9 @@ export default async function AdminLayout({ children }: { children: ReactNode })
           <p className="mt-3 text-sm text-neutral-700">
             This account is signed in, and it is not an administrator.
           </p>
-          <a href="/" className="mt-6 inline-block rounded-md border-2 border-black px-4 py-2 text-sm font-bold hover:border-red-500 hover:text-red-600">
+          <Link href="/" className="mt-6 inline-block rounded-md border-2 border-black px-4 py-2 text-sm font-bold hover:border-red-500 hover:text-red-600">
             Back to the site
-          </a>
+          </Link>
         </div>
       </div>
     )
